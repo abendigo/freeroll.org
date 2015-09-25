@@ -5,7 +5,7 @@ machine:
 
 dependencies:
   pre:
-    - docker build -t abendigo/freeroll.org:$CIRCLE_SHA1
+    - docker build -t abendigo/freeroll.org:$CIRCLE_SHA1 .
 
 test:
   post:
