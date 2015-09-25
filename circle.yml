@@ -18,3 +18,4 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - docker push abendigo/freeroll.org:$CIRCLE_SHA1
+      - ssh ci@ovh.oosterveld.org -p 24 docker pull abendigo/freeroll.org:$CIRCLE_SHA1
