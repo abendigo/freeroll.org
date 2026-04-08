@@ -278,8 +278,11 @@ All existing examples (Casino Clicker, Idle Casino Empire, Idle Casino Manager) 
 
 ## Open Questions
 
-- Does offline progress accrue while the app is closed? (Standard idle mechanic — probably yes, capped at e.g. 8 hours. Needs deciding.)
 - What is the retention mechanic? (Daily bonus, push notifications, login streak — nothing designed yet.)
 - What is the "one interaction" button, if any? Hero call? All-in shove?
 - How much real poker knowledge should be required? (Probably none — should be approachable to non-players.)
-- Tie-in with freeroll aggregator if that project ever resumes?
+- First 5 upgrades — ordering needs deciding before PRD can be written.
+
+## Decided
+
+- **No offline progress.** The game does not accrue earnings while the app is closed. Every cycle requires the player to show up. Suits the active-idle format and mobile session pattern.
