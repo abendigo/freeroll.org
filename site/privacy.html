@@ -1,4 +1,4 @@
-<title>Freeroll — leaderboard</title>
+<title>Freeroll — privacy</title>
 <style>
   :root {
     --bg: #f5f5f6;
@@ -124,58 +124,35 @@
   }
   .btn-outline:hover { border-color: var(--ink); }
 
-  .btn-primary {
-    position: relative;
-    display: inline-block;
-    font-size: 17px;
-    letter-spacing: 0.03em;
-    color: #fff;
-    background: #0c0c0d;
-    padding: 18px 56px;
-    border-radius: 12px;
-    text-decoration: none;
-    text-transform: uppercase;
-    z-index: 0;
-  }
-  @keyframes spin-glow { to { background-position: 300% 50%; } }
-  .btn-primary::before {
-    content: "";
-    position: absolute; inset: -2px; border-radius: 14px; z-index: -1;
-    background: linear-gradient(90deg, var(--glow-a), var(--glow-b), var(--glow-a));
-    background-size: 300% 100%;
-    animation: spin-glow 5s linear infinite;
-  }
-  .btn-primary:hover::before { filter: brightness(1.15); }
-
   /* ---------- generic sections ---------- */
   .section { padding: 52px 0; border-top: 1px solid var(--border); }
   .section-head { margin-bottom: 26px; }
   .section-head h2 { font-size: 23px; margin-top: 8px; }
   .section-head p { color: var(--ink-muted); margin-top: 8px; font-size: 15px; max-width: 52ch; }
 
-  table.board { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  table.board th {
-    text-align: left; font-family: "Roboto Mono", monospace; font-size: 11px;
-    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint);
-    font-weight: 500; padding: 0 10px 8px; border-bottom: 1px solid var(--border);
+  .policy-block { margin-bottom: 30px; }
+  .policy-block:last-child { margin-bottom: 0; }
+  .policy-block h3 { font-size: 16px; margin-bottom: 8px; }
+  .policy-block p { font-size: 14.5px; color: var(--ink-muted); margin: 0 0 8px; max-width: 62ch; }
+  .policy-block p:last-child { margin-bottom: 0; }
+  .policy-block code {
+    font-family: "Roboto Mono", monospace; font-size: 13px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 5px;
+    padding: 1px 6px;
   }
-  table.board td { padding: 10px; border-bottom: 1px solid var(--border); }
-  table.board tr:last-child td { border-bottom: none; }
-  table.board td.rank { color: var(--ink-faint); width: 2ch; }
-  table.board td.ep { text-align: right; font-weight: 700; color: color-mix(in srgb, var(--glow-c) 60%, var(--ink)); }
-  .board-note { font-size: 12.5px; color: var(--ink-faint); margin-top: 10px; }
+  .policy-block a { text-decoration: underline; font-weight: 600; color: var(--ink); }
 
-  .final-cta { padding: 60px 0; text-align: center; }
-  .final-cta h2 { font-size: 25px; margin-bottom: 8px; }
-  .final-cta p { color: var(--ink-muted); font-size: 15px; margin-bottom: 28px; }
+  .status-note {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; font-size: 14px; color: var(--ink-muted); margin-bottom: 30px;
+  }
+  .status-note strong { color: var(--ink); }
 
   footer { border-top: 1px solid var(--border); padding: 28px 0 40px; text-align: center; font-size: 12.5px; color: var(--ink-faint); }
+  footer a { text-decoration: underline; }
 
   @media (max-width: 620px) {
     .header-left .header-link { display: none; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .btn-primary::before { animation: none; background-position: 0 0; }
   }
 </style>
 
@@ -202,28 +179,33 @@
   <section class="section" style="border-top:none;">
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow">Leaderboard</div>
-        <h2>Today's luckiest deals</h2>
-        <p>Ranked globally by absolute EP — works whether it's you and nine friends or the whole internet.</p>
+        <div class="eyebrow">Privacy</div>
+        <h2>What we collect: basically nothing, so far</h2>
+        <p>Freeroll doesn't have accounts, a database, or a server yet — right now this is a static, informational site. Here's exactly what happens today.</p>
       </div>
-      <table class="board">
-        <thead><tr><th>Rank</th><th>Player</th><th>Tier</th><th style="text-align:right;">EP</th></tr></thead>
-        <tbody>
-          <tr><td class="rank">1</td><td>riverrat</td><td>The Nuts</td><td class="ep mono">41,880</td></tr>
-          <tr><td class="rank">2</td><td>quietgrind</td><td>High Roller</td><td class="ep mono">19,204</td></tr>
-          <tr><td class="rank">3</td><td>b_folds</td><td>High Roller</td><td class="ep mono">14,770</td></tr>
-          <tr><td class="rank">4</td><td>you?</td><td>—</td><td class="ep mono">—</td></tr>
-        </tbody>
-      </table>
-      <div class="board-note">Daily, weekly, and all-time boards. Your nickname, your call.</div>
-    </div>
-  </section>
 
-  <section class="final-cta">
-    <div class="wrap">
-      <h2>Today's deal is waiting.</h2>
-      <p>Takes about thirty seconds. Comes around again at 00:00 UTC.</p>
-      <a class="btn-primary" href="index.html">Deal</a>
+      <div class="status-note"><strong>Where this page stands:</strong> everything below describes freeroll.org as it actually runs right now, not the eventual game. It'll be rewritten to match reality before anything below stops being true — not after.</div>
+
+      <div class="policy-block">
+        <h3>What we store</h3>
+        <p>Your theme choice (light, dark, or auto) is saved in your browser's <code>localStorage</code> under the key <code>freeroll-theme</code>. It never leaves your device — we don't receive it, see it, or store a copy of it ourselves. Clearing your browser data clears it.</p>
+        <p>That's the only thing this site writes anywhere. There are no accounts, no sign-up forms, no email collection, no cookies set by us, and no analytics or tracking scripts embedded on any page.</p>
+      </div>
+
+      <div class="policy-block">
+        <h3>Hosting</h3>
+        <p>Freeroll is hosted on Cloudflare Pages. Like any website, Cloudflare processes standard connection metadata (such as your IP address) as part of serving the page and protecting it from abuse — that's Cloudflare acting as our infrastructure provider, not data we separately collect or can see ourselves. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare's privacy policy</a> for how they handle it.</p>
+      </div>
+
+      <div class="policy-block">
+        <h3>When the actual game ships</h3>
+        <p>The plan is passwordless sign-in, a chosen nickname, and a record of your daily deals and leaderboard results — modeled closely on how <a href="https://rngdle.com" target="_blank" rel="noopener">rngdle.com</a> handles it, including hashing rather than storing anything sensitive in the clear. None of that exists yet. When it does, this page changes first.</p>
+      </div>
+
+      <div class="policy-block">
+        <h3>Questions</h3>
+        <p>Reach out at <a href="mailto:mark@oosterveld.org">mark@oosterveld.org</a>.</p>
+      </div>
     </div>
   </section>
 
@@ -233,6 +215,7 @@
   <div class="wrap">
     freeroll.org — a poker-themed daily luck game.<br>
     "Freeroll" is a poker term too: a tournament that costs nothing to enter.<br>
+    Format heavily inspired by <a href="https://rngdle.com" target="_blank" rel="noopener">rngdle.com</a> — go roll the original too.<br>
     <a href="privacy.html">Privacy</a>
   </div>
 </footer>
