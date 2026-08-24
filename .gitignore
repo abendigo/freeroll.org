@@ -1,2 +1,8 @@
 node_modules/
 .wrangler/
+.svelte-kit/
+build/
+.env
+data/*.db
+data/*.db-*
+

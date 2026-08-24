@@ -122,9 +122,13 @@ without reworking the core.
 - **EP/probability tables:** precomputed offline (combinatorics or Monte Carlo), shipped as static data.
 
 ## Build approach — vertical slice first
-Scaffold app + Turso/Drizzle schema, build the hand evaluator, one daily deal, the ~30s per-street
+Scaffold app + Turso/Kysely schema, build the hand evaluator, one daily deal, the ~30s per-street
 reveal, and EP scoring end-to-end for a logged-in player. Then layer on badges, tiers, leaderboards,
 sharing, and deploy config.
+
+**Progress:** SvelteKit app scaffolded, magic-link auth (request → Resend email → verify → session
+→ logout) and the initial `users`/`magic_link_tokens`/`sessions`/`login_attempts` schema are built
+and tested locally — not deployed yet. Hand evaluator, daily deal, and scoring are still ahead.
 
 ## Assumptions (stated, not blocking)
 - **One deal per player per day**, with a fixed daily reset time (default 00:00 UTC).
