@@ -1,0 +1,28 @@
+name: PR Preview Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete preview deployments for this branch
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          ids=$(npx wrangler pages deployment list --project-name=freeroll --json \
+            | jq -r --arg branch "$BRANCH" '.[] | select(.Branch == $branch) | .Id')
+
+          if [ -z "$ids" ]; then
+            echo "No preview deployments found for branch $BRANCH"
+            exit 0
+          fi
+
+          for id in $ids; do
+            echo "Deleting deployment $id (branch: $BRANCH)"
+            npx wrangler pages deployment delete "$id" --project-name=freeroll --force
+          done
