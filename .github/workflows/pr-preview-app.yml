@@ -1,11 +1,17 @@
-name: PR Preview
+name: PR Preview (App)
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - "site/**"
-      - ".github/workflows/pr-preview.yml"
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "svelte.config.js"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - "wrangler.jsonc"
+      - ".github/workflows/pr-preview-app.yml"
 
 permissions:
   contents: read
@@ -17,21 +23,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy to Cloudflare Pages
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Deploy preview worker
         id: deploy
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site --project-name=freeroll --branch=${{ github.head_ref }}
+          command: deploy --name freeroll-app-pr-${{ github.event.number }}
 
       - name: Comment preview URL on PR
         uses: actions/github-script@v7
         with:
           script: |
-            const url = "${{ steps.deploy.outputs.pages-deployment-alias-url }}";
-            const marker = "<!-- freeroll-preview-comment -->";
-            const body = `${marker}\n🚀 Preview deployed: ${url}`;
+            const url = "${{ steps.deploy.outputs.deployment-url }}";
+            const marker = "<!-- freeroll-app-preview-comment -->";
+            const body = `${marker}\n🚀 App preview deployed: ${url}`;
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
