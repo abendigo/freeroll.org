@@ -3,6 +3,15 @@ name: PR Preview (App)
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "svelte.config.js"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - "wrangler.jsonc"
+      - ".github/workflows/pr-preview-app.yml"
 
 permissions:
   contents: read

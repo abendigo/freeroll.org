@@ -3,6 +3,15 @@ name: Deploy App to Production
 on:
   push:
     branches: [main]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "svelte.config.js"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - "wrangler.jsonc"
+      - ".github/workflows/deploy-app.yml"
 
 jobs:
   deploy:

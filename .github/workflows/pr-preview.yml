@@ -3,6 +3,9 @@ name: PR Preview
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - "site/**"
+      - ".github/workflows/pr-preview.yml"
 
 permissions:
   contents: read
