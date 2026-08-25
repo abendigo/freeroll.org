@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { env } from '$env/dynamic/public';
 
 	let { children, data } = $props();
 
@@ -34,6 +35,12 @@
 		});
 	});
 </script>
+
+<svelte:head>
+	{#if env.PUBLIC_UMAMI_URL && env.PUBLIC_UMAMI_WEBSITE_ID}
+		<script defer src="{env.PUBLIC_UMAMI_URL}/script.js" data-website-id={env.PUBLIC_UMAMI_WEBSITE_ID}></script>
+	{/if}
+</svelte:head>
 
 <header>
 	<div class="header-inner">

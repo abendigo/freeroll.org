@@ -44,3 +44,7 @@ jobs:
           echo -n "${{ secrets.HASH_SECRET }}" | npx wrangler secret put HASH_SECRET --name freeroll-app
           echo -n "${{ secrets.RESEND_API_KEY }}" | npx wrangler secret put RESEND_API_KEY --name freeroll-app
           echo -n "${{ secrets.FROM_ADDRESS }}" | npx wrangler secret put FROM_ADDRESS --name freeroll-app
+          # Production only — PR previews deliberately don't get these, so test traffic never
+          # pollutes real analytics.
+          echo -n "${{ secrets.PUBLIC_UMAMI_URL }}" | npx wrangler secret put PUBLIC_UMAMI_URL --name freeroll-app
+          echo -n "${{ secrets.PUBLIC_UMAMI_WEBSITE_ID }}" | npx wrangler secret put PUBLIC_UMAMI_WEBSITE_ID --name freeroll-app
