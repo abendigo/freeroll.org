@@ -1,0 +1,44 @@
+<script lang="ts">
+	import { enhance } from '$app/forms';
+	import type { PageProps } from './$types';
+
+	let { data, form }: PageProps = $props();
+</script>
+
+<svelte:head>
+	<title>Freeroll — account</title>
+</svelte:head>
+
+<section>
+	<div class="auth-card">
+		<div class="eyebrow">Account</div>
+		{#if data.user.nickname}
+			<h1>{data.user.nickname}</h1>
+			<p>Shown on leaderboards. Pick a different one below if you'd like.</p>
+		{:else}
+			<h1>Choose a nickname</h1>
+			<p>Optional — shown on leaderboards if you set one. Skip it and browse anyway if you're not ready.</p>
+		{/if}
+		<form method="POST" action="?/setNickname" use:enhance>
+			<input
+				type="text"
+				name="nickname"
+				placeholder="riverrat"
+				value={form?.nickname ?? data.user.nickname ?? ''}
+				minlength="3"
+				maxlength="20"
+				required
+			/>
+			<button class="btn-primary" type="submit">{data.user.nickname ? 'Update' : 'Set nickname'}</button>
+		</form>
+		{#if form?.error}
+			<p class="error">{form.error}</p>
+		{:else if form?.saved}
+			<p class="success">Saved.</p>
+		{/if}
+		<p style="margin-top: 24px;"><a href="/">Skip for now — back to Freeroll</a></p>
+		<form method="POST" action="/logout" style="margin-top: 8px;">
+			<button class="btn-outline" type="submit">Sign out</button>
+		</form>
+	</div>
+</section>

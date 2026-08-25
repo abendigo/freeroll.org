@@ -56,9 +56,7 @@
 				<button type="button" data-mode="dark" aria-label="Dark theme" bind:this={themeButtons[2]}>☾</button>
 			</div>
 			{#if data.user}
-				<form method="POST" action="/logout">
-					<button class="btn-outline" type="submit">Sign out</button>
-				</form>
+				<a class="btn-outline" href="/account">{data.user.nickname ?? 'Account'}</a>
 			{:else}
 				<a class="btn-outline" href="/login">Sign in</a>
 			{/if}
@@ -230,9 +228,6 @@
 		display: flex;
 		align-items: center;
 		gap: 12px;
-	}
-	.header-right form {
-		margin: 0;
 	}
 
 	.theme-toggle {
