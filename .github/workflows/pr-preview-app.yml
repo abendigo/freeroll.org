@@ -28,6 +28,19 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Install Turso CLI
+        run: curl -sSfL https://get.tur.so/install.sh | bash
+
+      - name: Branch database from staging template
+        env:
+          TURSO_API_TOKEN: ${{ secrets.TURSO_API_TOKEN }}
+        run: |
+          DB_NAME="freeroll-app-pr-${{ github.event.number }}"
+          # Fresh branch on every push to this PR, not reused — delete any leftover from a
+          # prior push first (no-op if this is the first push, hence the || true).
+          $HOME/.turso/turso db destroy "$DB_NAME" --yes || true
+          $HOME/.turso/turso db create "$DB_NAME" --from-db freeroll-staging
+
       - run: npm ci
       - run: npm run build
 
@@ -38,6 +51,19 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --name freeroll-app-pr-${{ github.event.number }}
+
+      - name: Set database secrets on preview worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TURSO_API_TOKEN: ${{ secrets.TURSO_API_TOKEN }}
+        run: |
+          DB_NAME="freeroll-app-pr-${{ github.event.number }}"
+          WORKER_NAME="freeroll-app-pr-${{ github.event.number }}"
+          DB_URL=$($HOME/.turso/turso db show "$DB_NAME" --url)
+          DB_TOKEN=$($HOME/.turso/turso db tokens create "$DB_NAME")
+          echo -n "$DB_URL" | npx wrangler secret put TURSO_DATABASE_URL --name "$WORKER_NAME"
+          echo -n "$DB_TOKEN" | npx wrangler secret put TURSO_AUTH_TOKEN --name "$WORKER_NAME"
 
       - name: Comment preview URL on PR
         uses: actions/github-script@v7
