@@ -25,7 +25,7 @@
 
 		<div class="policy-block">
 			<h3>When the actual game ships</h3>
-			<p>The plan is passwordless sign-in, a chosen nickname, and a record of your daily deals and leaderboard results — modeled closely on how <a href="https://rngdle.com" target="_blank" rel="noopener">rngdle.com</a> handles it, including hashing rather than storing anything sensitive in the clear. None of that exists yet. When it does, this page changes first.</p>
+			<p>The plan is passwordless sign-in, a chosen nickname, and a record of your daily deals and leaderboard results — modeled closely on how <a href="https://rngdle.com" target="_blank" rel="noopener">rngdle.com</a> handles it. We won't store your email address itself — only a salted cryptographic hash of it, computed fresh from what you type in each time you sign in. We can't read it back, and we won't use it for anything beyond that one sign-in link. That protects your email if our database alone ever leaked; it isn't a guarantee against every possible compromise, and we'd rather say that plainly than oversell it. None of that exists yet. When it does, this page changes first.</p>
 		</div>
 
 		<div class="policy-block">
