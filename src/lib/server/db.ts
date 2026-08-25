@@ -42,12 +42,26 @@ export interface MigrationsTable {
 	applied_at: Generated<string>;
 }
 
+export interface DealsTable {
+	id: Generated<number>;
+	user_id: number | null;
+	anon_id: string | null;
+	date: string;
+	hole_cards: string;
+	board: string;
+	per_street_ep: string;
+	total_ep: number;
+	hand_rank: string;
+	created_at: Generated<string>;
+}
+
 export interface AppDatabase {
 	users: UsersTable;
 	magic_link_tokens: MagicLinkTokensTable;
 	sessions: SessionsTable;
 	login_attempts: LoginAttemptsTable;
 	migrations: MigrationsTable;
+	deals: DealsTable;
 }
 
 // Local dev talks to a plain SQLite file on disk (no Turso account needed to develop).
