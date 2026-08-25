@@ -1,7 +1,14 @@
 import { runMigrations } from '$lib/server/migrate';
 import { db } from '$lib/server/db';
 import { SESSION_COOKIE_NAME, validateSession } from '$lib/server/auth/sessions';
+import { comingSoonPage } from '$lib/server/coming-soon';
+import { env } from '$env/dynamic/private';
 import type { Handle } from '@sveltejs/kit';
+
+// Preview bypass: visiting /?preview=<PREVIEW_SECRET> once sets a long-lived cookie that skips
+// the gate on every later request from that browser, so we (and only we) can still see and test
+// the real site while it's hidden from everyone else.
+const PREVIEW_COOKIE_NAME = 'freeroll_preview';
 
 // Bundled at build time (raw SQL embedded directly into the JS), not read from disk — Cloudflare
 // Workers has no real filesystem at runtime, so the fs-based approach migrate-cli.ts uses for
@@ -27,6 +34,29 @@ function ensureMigrated(): Promise<void> {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
+	if (env.COMING_SOON === 'true') {
+		const secret = env.PREVIEW_SECRET;
+		const queryPreview = event.url.searchParams.get('preview');
+		const bypassed = !!secret && (queryPreview === secret || event.cookies.get(PREVIEW_COOKIE_NAME) === secret);
+
+		if (!bypassed) {
+			return new Response(comingSoonPage(), {
+				status: 503,
+				headers: { 'content-type': 'text/html; charset=utf-8', 'retry-after': '3600' }
+			});
+		}
+
+		if (queryPreview === secret) {
+			event.cookies.set(PREVIEW_COOKIE_NAME, secret, {
+				path: '/',
+				maxAge: 60 * 60 * 24 * 365,
+				httpOnly: true,
+				secure: true,
+				sameSite: 'lax'
+			});
+		}
+	}
+
 	await ensureMigrated();
 
 	const sessionId = event.cookies.get(SESSION_COOKIE_NAME);
