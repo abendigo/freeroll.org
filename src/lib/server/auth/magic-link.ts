@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import type { Kysely } from 'kysely';
 import type { AppDatabase } from '../db';
 import { env } from '$env/dynamic/private';
+import { trackEvent } from '../analytics';
 import { sendEmail } from '../email/send';
 import { renderTemplate } from '../email/render';
 import MagicLink from '../email/templates/MagicLink.svelte';
@@ -81,6 +82,8 @@ export async function requestMagicLink(
 		return { success: true };
 	}
 
+	trackEvent('magic_link_requested');
+
 	const baseUrl = env.APP_BASE_URL || 'https://freeroll.org';
 	const magicLinkUrl = `${baseUrl}/login/verify/${token}`;
 
@@ -112,6 +115,8 @@ export async function verifyMagicLink(db: Kysely<AppDatabase>, token: string): P
 
 	const user = await db.selectFrom('users').selectAll().where('id', '=', record.user_id).executeTakeFirstOrThrow();
 	const session = await createSession(db, user.id);
+
+	trackEvent('signed_in');
 
 	return { success: true, session, user };
 }
