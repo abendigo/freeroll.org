@@ -16,9 +16,19 @@ const migrationFiles = Object.fromEntries(
 	Object.entries(migrationModules).map(([path, sql]) => [path.split('/').pop()!, sql])
 );
 
-await runMigrations(migrationFiles);
+// Workers forbids async I/O at module top level ("global scope") — it has to happen inside a
+// request handler. Cache the in-flight promise (not just a boolean) so concurrent requests
+// during a cold start all await the same run instead of racing to start their own; once
+// resolved, later requests on this isolate just await an already-settled promise.
+let migrationsReady: Promise<void> | null = null;
+function ensureMigrated(): Promise<void> {
+	if (!migrationsReady) migrationsReady = runMigrations(migrationFiles);
+	return migrationsReady;
+}
 
 export const handle: Handle = async ({ event, resolve }) => {
+	await ensureMigrated();
+
 	const sessionId = event.cookies.get(SESSION_COOKIE_NAME);
 
 	if (!sessionId) {
