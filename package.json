@@ -10,7 +10,7 @@
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "migrate": "tsx src/lib/server/migrate.ts"
+    "migrate": "tsx src/lib/server/migrate-cli.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "^7.2.9",
@@ -26,7 +26,8 @@
   "dependencies": {
     "@libsql/client": "^0.14.0",
     "@libsql/kysely-libsql": "^0.4.1",
-    "kysely": "^0.28.14"
+    "kysely": "^0.28.14",
+    "resend": "^6.9.4"
   },
   "overrides": {
     "@libsql/core": "0.14.0"

@@ -34,10 +34,13 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
 
-      - name: Set database secrets
+      - name: Set worker secrets
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           echo -n "${{ secrets.TURSO_DATABASE_URL }}" | npx wrangler secret put TURSO_DATABASE_URL --name freeroll-app
           echo -n "${{ secrets.TURSO_AUTH_TOKEN }}" | npx wrangler secret put TURSO_AUTH_TOKEN --name freeroll-app
+          echo -n "${{ secrets.HASH_SECRET }}" | npx wrangler secret put HASH_SECRET --name freeroll-app
+          echo -n "${{ secrets.RESEND_API_KEY }}" | npx wrangler secret put RESEND_API_KEY --name freeroll-app
+          echo -n "${{ secrets.FROM_ADDRESS }}" | npx wrangler secret put FROM_ADDRESS --name freeroll-app
