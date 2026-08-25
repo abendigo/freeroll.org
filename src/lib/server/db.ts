@@ -10,14 +10,14 @@ const env = typeof process !== 'undefined' ? process.env : ({} as Record<string,
 
 export interface UsersTable {
 	id: Generated<number>;
-	email: string;
+	email_hash: string;
 	nickname: string | null;
 	created_at: Generated<string>;
 }
 
 export interface MagicLinkTokensTable {
 	token: string;
-	email: string;
+	user_id: number;
 	expires_at: string;
 	used_at: string | null;
 	created_at: Generated<string>;
@@ -32,7 +32,7 @@ export interface SessionsTable {
 export interface LoginAttemptsTable {
 	id: Generated<number>;
 	key_type: 'email' | 'ip';
-	key_value: string;
+	key_hash: string;
 	attempted_at: Generated<string>;
 }
 
