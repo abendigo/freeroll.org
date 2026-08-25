@@ -11,8 +11,7 @@
 		<h1>One deal a day. Two hole cards, five on the board. What will yours be?</h1>
 		<!-- svelte-ignore a11y_invalid_attribute -- placeholder until the deal flow exists (later PR) -->
 		<a class="btn-primary" href="#">Deal</a>
-		<!-- svelte-ignore a11y_invalid_attribute -- placeholder until sign-up exists (later PR) -->
-		<span class="cta-note"><a href="#">Sign up</a> before you deal to save it and climb the leaderboard</span>
+		<span class="cta-note"><a href="/login">Sign up</a> before you deal to save it and climb the leaderboard</span>
 
 		<div class="featured" id="board">
 			<div class="eyebrow">Today's best deal</div>

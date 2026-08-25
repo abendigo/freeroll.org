@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
 
 	let themeButtons: HTMLButtonElement[] = [];
 
@@ -48,8 +48,13 @@
 				<button type="button" data-mode="auto" aria-label="Auto theme" class="active" bind:this={themeButtons[1]}>◐</button>
 				<button type="button" data-mode="dark" aria-label="Dark theme" bind:this={themeButtons[2]}>☾</button>
 			</div>
-			<!-- svelte-ignore a11y_invalid_attribute -- placeholder until sign-in exists (later PR) -->
-			<a class="btn-outline" href="#">Sign in</a>
+			{#if data.user}
+				<form method="POST" action="/logout">
+					<button class="btn-outline" type="submit">Sign out</button>
+				</form>
+			{:else}
+				<a class="btn-outline" href="/login">Sign in</a>
+			{/if}
 		</div>
 	</div>
 </header>
@@ -218,6 +223,9 @@
 		display: flex;
 		align-items: center;
 		gap: 12px;
+	}
+	.header-right form {
+		margin: 0;
 	}
 
 	.theme-toggle {
@@ -745,6 +753,52 @@
 		color: var(--ink-muted);
 		font-size: 15px;
 		margin-bottom: 28px;
+	}
+
+	:global(.auth-card) {
+		max-width: 420px;
+		margin: 64px auto;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 20px;
+		box-shadow: var(--shadow);
+		padding: 32px 28px;
+		text-align: center;
+	}
+	:global(.auth-card h1) {
+		font-size: 22px;
+		margin: 10px 0 8px;
+	}
+	:global(.auth-card p) {
+		color: var(--ink-muted);
+		font-size: 14.5px;
+		margin: 0 0 24px;
+	}
+	:global(.auth-card input[type='email']) {
+		width: 100%;
+		font-family: inherit;
+		font-size: 14.5px;
+		padding: 12px 14px;
+		border-radius: 10px;
+		border: 1px solid var(--border);
+		background: var(--bg);
+		color: var(--ink);
+		margin-bottom: 14px;
+	}
+	:global(.auth-card .btn-primary) {
+		width: 100%;
+		padding: 14px 0;
+		font-size: 14.5px;
+	}
+	:global(.auth-card .error) {
+		color: color-mix(in srgb, var(--glow-c) 75%, var(--ink));
+		font-size: 13.5px;
+		margin-top: 14px;
+	}
+	:global(.auth-card .success) {
+		color: color-mix(in srgb, var(--glow-b) 60%, var(--ink));
+		font-size: 14.5px;
+		margin-top: 14px;
 	}
 
 	footer {

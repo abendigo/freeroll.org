@@ -26,7 +26,8 @@
   "dependencies": {
     "@libsql/client": "^0.14.0",
     "@libsql/kysely-libsql": "^0.4.1",
-    "kysely": "^0.28.14"
+    "kysely": "^0.28.14",
+    "resend": "^6.9.4"
   },
   "overrides": {
     "@libsql/core": "0.14.0"
