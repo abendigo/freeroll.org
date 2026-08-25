@@ -44,6 +44,12 @@ jobs:
           echo -n "${{ secrets.HASH_SECRET }}" | npx wrangler secret put HASH_SECRET --name freeroll-app
           echo -n "${{ secrets.RESEND_API_KEY }}" | npx wrangler secret put RESEND_API_KEY --name freeroll-app
           echo -n "${{ secrets.FROM_ADDRESS }}" | npx wrangler secret put FROM_ADDRESS --name freeroll-app
+          # Coming-soon gate — see src/hooks.server.ts. COMING_SOON is usually unset (repo/org
+          # secrets that don't exist just resolve to an empty string here, which is off); flip
+          # it to "true" in the repo's Actions secrets to hide the site, "false"/delete to
+          # unhide. PREVIEW_SECRET is the bypass value for /?preview=<secret>.
+          echo -n "${{ secrets.COMING_SOON }}" | npx wrangler secret put COMING_SOON --name freeroll-app
+          echo -n "${{ secrets.PREVIEW_SECRET }}" | npx wrangler secret put PREVIEW_SECRET --name freeroll-app
           # Production only — PR previews deliberately don't get these, so test traffic never
           # pollutes real analytics.
           echo -n "${{ secrets.PUBLIC_UMAMI_URL }}" | npx wrangler secret put PUBLIC_UMAMI_URL --name freeroll-app

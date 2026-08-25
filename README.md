@@ -8,6 +8,11 @@ This SvelteKit app **is** the live site — freeroll.org and www.freeroll.org ar
 `freeroll-app` Cloudflare Worker. Right now that's the marketing pages only (home, about,
 leaderboard, privacy); the actual game (deals, scoring, badges) isn't built yet.
 
+Production is currently sitting behind a "coming soon" gate (`COMING_SOON=true`, set as a repo
+secret — see `src/hooks.server.ts`), so none of the above is publicly reachable yet. Visiting
+`/?preview=<PREVIEW_SECRET>` once bypasses it for that browser via a cookie. To launch for real,
+set the `COMING_SOON` repo secret to `false` (or delete it) and redeploy.
+
 ## Dev setup
 
 ```
