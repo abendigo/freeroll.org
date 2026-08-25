@@ -1,9 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { client, db } from './db';
-
-const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), 'migrations');
 
 const BOOTSTRAP_MIGRATIONS_TABLE = `
   CREATE TABLE IF NOT EXISTS migrations (
@@ -13,38 +8,30 @@ const BOOTSTRAP_MIGRATIONS_TABLE = `
   );
 `;
 
-export async function runMigrations(): Promise<void> {
+/**
+ * Applies whichever of `migrationFiles` (name -> raw SQL) haven't been recorded in the
+ * `migrations` table yet, in name order. Deliberately takes already-loaded content rather than
+ * reading files itself: Cloudflare Workers has no real filesystem, so this same function needs
+ * to work whether it's called from the deployed app (content bundled at build time via
+ * `import.meta.glob`, see hooks.server.ts) or from the standalone CLI (content read from disk
+ * via plain `fs`, see migrate-cli.ts) — those are two genuinely different loading mechanisms,
+ * not something this function should know about.
+ */
+export async function runMigrations(migrationFiles: Record<string, string>): Promise<void> {
 	await client.executeMultiple(BOOTSTRAP_MIGRATIONS_TABLE);
 
 	const applied = new Set(
 		(await db.selectFrom('migrations').select('name').execute()).map((row) => row.name)
 	);
 
-	const files = readdirSync(migrationsDir)
-		.filter((name) => name.endsWith('.sql'))
-		.sort();
+	const names = Object.keys(migrationFiles).sort();
 
-	for (const name of files) {
+	for (const name of names) {
 		if (applied.has(name)) continue;
 
-		const sqlText = readFileSync(join(migrationsDir, name), 'utf-8');
-		await client.executeMultiple(sqlText);
+		await client.executeMultiple(migrationFiles[name]);
 		await db.insertInto('migrations').values({ name, applied_at: new Date().toISOString() }).execute();
 
 		console.log(`Applied migration: ${name}`);
 	}
-}
-
-// Allow `tsx src/lib/server/migrate.ts` (or `npm run migrate`) to apply migrations directly,
-// while still being importable (e.g. from tests) without running anything on import.
-if (import.meta.url === `file://${process.argv[1]}`) {
-	runMigrations()
-		.then(() => {
-			console.log('Migrations complete.');
-			process.exit(0);
-		})
-		.catch((err) => {
-			console.error(err);
-			process.exit(1);
-		});
 }

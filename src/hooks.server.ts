@@ -3,7 +3,20 @@ import { db } from '$lib/server/db';
 import { SESSION_COOKIE_NAME, validateSession } from '$lib/server/auth/sessions';
 import type { Handle } from '@sveltejs/kit';
 
-await runMigrations();
+// Bundled at build time (raw SQL embedded directly into the JS), not read from disk — Cloudflare
+// Workers has no real filesystem at runtime, so the fs-based approach migrate-cli.ts uses for
+// `npm run migrate` can't work here. Keys come back as full paths ('./lib/server/migrations/
+// 0001_initial.sql'); runMigrations() just needs a name, so normalize to the basename.
+const migrationModules = import.meta.glob('./lib/server/migrations/*.sql', {
+	query: '?raw',
+	import: 'default',
+	eager: true
+}) as Record<string, string>;
+const migrationFiles = Object.fromEntries(
+	Object.entries(migrationModules).map(([path, sql]) => [path.split('/').pop()!, sql])
+);
+
+await runMigrations(migrationFiles);
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get(SESSION_COOKIE_NAME);
