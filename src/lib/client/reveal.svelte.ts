@@ -217,6 +217,10 @@ export function createRevealEngine() {
 		scoredStreets = [];
 		runningTotal = 0;
 
+		// A beat of stillness after the deck stops shuffling, so the first card dealing doesn't
+		// read as one continuous motion with the shuffle.
+		await sleep(400);
+
 		// Preflop: deal both hole cards, gather into a pile, flip together, spread back out.
 		await dealBatch([
 			{ role: 'hole', slot: 0, code: result.holeCards[0] },
