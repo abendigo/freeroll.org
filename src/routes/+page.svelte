@@ -219,13 +219,13 @@
 	   the three layers riffle against each other instead of moving as one block; the .deck-card
 	   with no nth-child override (the top card) gets the "cut": a lift-and-shift near the end. */
 	.deck.shuffling .deck-card:nth-child(1) {
-		animation: riffle-back 900ms ease-in-out;
+		animation: riffle-back 2200ms ease-in-out;
 	}
 	.deck.shuffling .deck-card:nth-child(2) {
-		animation: riffle-mid 900ms ease-in-out;
+		animation: riffle-mid 2200ms ease-in-out;
 	}
 	.deck.shuffling .deck-card:nth-child(3) {
-		animation: riffle-top 900ms ease-in-out;
+		animation: riffle-top 2200ms ease-in-out;
 	}
 	@keyframes riffle-back {
 		0%, 100% { transform: translate(-2px, 2px) rotate(0deg); }

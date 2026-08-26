@@ -68,7 +68,7 @@ export const revealSpeed = $state({ value: 1 });
 // not scaled by revealSpeed the way sleep()'s delays are (the CSS keyframes in +page.svelte/
 // dev/reveal driving the actual motion have their own fixed duration too, same limitation as the
 // 420ms card-flip transition elsewhere). Kept roughly matched to that CSS duration at 1x.
-const SHUFFLE_DURATION = 900;
+const SHUFFLE_DURATION = 2200;
 
 export function createRevealEngine() {
 	let phase = $state<Phase>('idle');
