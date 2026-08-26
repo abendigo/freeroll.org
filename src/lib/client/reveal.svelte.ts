@@ -124,12 +124,13 @@ export function createRevealEngine() {
 		await sleep(420);
 	}
 
-	/** Slides each piled card back out to its own slot, staggered, revealing them one at a time. */
+	/** Slides each piled card back out to its own slot, staggered, revealing them one at a time.
+	 *  Silent by design — for the flop this is two overlapping slide sounds 160ms apart on top of
+	 *  everything else in the sequence, which read as a stutter rather than a second event. */
 	async function divergeFromPile(role: CardVM['role'], slots: number[]) {
 		const moving = slots.filter((slot) => slot !== 0);
 		moving.forEach((slot, n) => {
 			setTimeout(() => {
-				playSound(n % 2 === 0 ? 'slide1' : 'slide2');
 				cardAt(role, slot)!.x = 0;
 			}, ms(n * 160));
 		});
