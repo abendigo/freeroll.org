@@ -29,6 +29,15 @@ function dealCards(): { hole: Card[]; board: Card[] } {
 	return { hole: deck.slice(0, 2), board: deck.slice(2, 7) };
 }
 
+/** Deals and scores a fresh hand with no persistence and no identity/uniqueness check attached —
+ *  the same shuffle + scoring `dealForIdentity` commits to the DB, minus the commit. Used by the
+ *  /dev/reveal harness to generate throwaway hands to replay the reveal animation against. */
+export function generateScoredDeal(): Omit<ScoredDeal, 'alreadyDealt'> {
+	const { hole, board } = dealCards();
+	const { perStreetEp, totalEp, handRank } = scoreDeal(hole, board);
+	return { holeCards: hole.map(cardCode), board: board.map(cardCode), perStreetEp, totalEp, handRank };
+}
+
 /**
  * Scores a committed deal street by street, per DLE.md: EP = surprisal (-log2 probability) of
  * *first* reaching a hand category, added only when the category actually improves. Category is
@@ -103,10 +112,7 @@ export async function dealForIdentity(db: Kysely<AppDatabase>, identity: DealIde
 	const existing = await findExisting(db, identity, today);
 	if (existing) return toScoredDeal(existing, true);
 
-	const { hole, board } = dealCards();
-	const { perStreetEp, totalEp, handRank } = scoreDeal(hole, board);
-	const holeCards = hole.map(cardCode);
-	const boardCodes = board.map(cardCode);
+	const { holeCards, board: boardCodes, perStreetEp, totalEp, handRank } = generateScoredDeal();
 
 	try {
 		await db
