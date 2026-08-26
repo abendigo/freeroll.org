@@ -60,6 +60,24 @@
 			{/if}
 		{:else if engine.deal}
 			<div class="reveal">
+				<!-- Board above hole cards — poker-video-game layout, board is the shared/community
+				     state so it reads top, the player's own cards sit below it. -->
+				<div class="table-row board-row">
+					{#each [0, 1, 2, 3, 4] as slot (slot)}
+						{@const c = engine.cardAt('board', slot)}
+						{#if c}
+							<Card code={c.code} faceUp={c.faceUp} x={c.x} y={c.y} rot={c.rot} size="board" />
+						{:else}
+							<div class="placeholder board"></div>
+						{/if}
+					{/each}
+					<div class="burn-pile">
+						{#each engine.cards.filter((c) => c.role === 'burn') as c (c.id)}
+							<Card code={c.code} faceUp={false} x={c.x} y={c.y} rot={c.rot} size="burn" />
+						{/each}
+					</div>
+				</div>
+
 				<div class="table-row hole-row">
 					{#each [0, 1] as slot (slot)}
 						{@const c = engine.cardAt('hole', slot)}
@@ -77,22 +95,6 @@
 					>
 						{soundState.muted ? '🔇' : '🔊'}
 					</button>
-				</div>
-
-				<div class="table-row board-row">
-					<div class="burn-pile">
-						{#each engine.cards.filter((c) => c.role === 'burn') as c (c.id)}
-							<Card code={c.code} faceUp={false} x={c.x} y={c.y} rot={c.rot} size="burn" />
-						{/each}
-					</div>
-					{#each [0, 1, 2, 3, 4] as slot (slot)}
-						{@const c = engine.cardAt('board', slot)}
-						{#if c}
-							<Card code={c.code} faceUp={c.faceUp} x={c.x} y={c.y} rot={c.rot} size="board" />
-						{:else}
-							<div class="placeholder board"></div>
-						{/if}
-					{/each}
 				</div>
 
 				{#if engine.currentBest}
@@ -172,7 +174,7 @@
 		/* Its own placement in .board-row (absolute, off to the side) doubles as the positioning
 		   context its burn Card children stack inside via their own x/y offsets. */
 		position: absolute;
-		left: -52px;
+		right: -52px;
 		bottom: 6px;
 		width: 38px;
 		height: 52px;
