@@ -25,7 +25,8 @@
 		try {
 			const [res] = await Promise.all([
 				fetch('/dev/reveal/deal', { method: 'POST' }),
-				preloadSounds().catch(() => {})
+				preloadSounds().catch(() => {}),
+				engine.shuffleDeck()
 			]);
 			if (!res.ok) throw new Error(`Server said ${res.status}`);
 			const result: ScoredDeal = await res.json();
@@ -39,7 +40,7 @@
 	async function replay() {
 		if (!lastDeal) return;
 		engine.startDealing();
-		await preloadSounds().catch(() => {});
+		await Promise.all([preloadSounds().catch(() => {}), engine.shuffleDeck()]);
 		await run(lastDeal);
 	}
 </script>
@@ -85,15 +86,14 @@
 	{/if}
 
 	<div class="table">
-		{#if engine.deal}
-			<!-- Every dealt card flies from here — see DECK_Y_BOARD/DECK_Y_HOLE in reveal.svelte.ts.
-			     Only shown once dealing actually starts, not in the idle state. -->
-			<div class="deck">
-				<div class="deck-card"></div>
-				<div class="deck-card"></div>
-				<div class="deck-card"></div>
-			</div>
-		{/if}
+		<!-- Persistent (never mounts/unmounts, so it never pops in). Every dealt card flies from
+		     here once dealing starts — see DECK_Y_BOARD/DECK_Y_HOLE in reveal.svelte.ts.
+		     .shuffling plays a riffle-riffle-cut while the deal fetch is in flight. -->
+		<div class="deck" class:shuffling={engine.phase === 'dealing'}>
+			<div class="deck-card"></div>
+			<div class="deck-card"></div>
+			<div class="deck-card"></div>
+		</div>
 		<!-- Board above hole cards — poker-video-game layout, board is the shared/community state
 		     so it reads top, the player's own cards sit below it. -->
 		<div class="table-row board-row">
@@ -251,6 +251,39 @@
 	}
 	.deck-card:nth-child(2) {
 		transform: translate(-1px, 1px);
+	}
+	/* Riffle, riffle, cut — see the matching comment in +page.svelte for why there's no wash step. */
+	.deck.shuffling .deck-card:nth-child(1) {
+		animation: riffle-back 900ms ease-in-out;
+	}
+	.deck.shuffling .deck-card:nth-child(2) {
+		animation: riffle-mid 900ms ease-in-out;
+	}
+	.deck.shuffling .deck-card:nth-child(3) {
+		animation: riffle-top 900ms ease-in-out;
+	}
+	@keyframes riffle-back {
+		0%, 100% { transform: translate(-2px, 2px) rotate(0deg); }
+		15% { transform: translate(-8px, 0px) rotate(-9deg); }
+		30% { transform: translate(-2px, 2px) rotate(0deg); }
+		50% { transform: translate(-8px, 0px) rotate(-9deg); }
+		65% { transform: translate(-2px, 2px) rotate(0deg); }
+	}
+	@keyframes riffle-mid {
+		0%, 100% { transform: translate(-1px, 1px) rotate(0deg); }
+		15% { transform: translate(6px, -1px) rotate(8deg); }
+		30% { transform: translate(-1px, 1px) rotate(0deg); }
+		50% { transform: translate(6px, -1px) rotate(8deg); }
+		65% { transform: translate(-1px, 1px) rotate(0deg); }
+	}
+	@keyframes riffle-top {
+		0%, 100% { transform: translate(0, 0) rotate(0deg); }
+		15% { transform: translate(1px, -3px) rotate(2deg); }
+		30% { transform: translate(0, 0) rotate(0deg); }
+		50% { transform: translate(1px, -3px) rotate(2deg); }
+		65% { transform: translate(0, 0) rotate(0deg); }
+		80% { transform: translate(-5px, -9px) rotate(-8deg); }
+		92% { transform: translate(4px, 3px) rotate(5deg); }
 	}
 	.raw {
 		margin-top: 28px;

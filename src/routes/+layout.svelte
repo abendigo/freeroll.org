@@ -279,24 +279,6 @@
 		padding: 88px 0 64px;
 		text-align: center;
 	}
-	:global(.placeholder-row) {
-		display: flex;
-		justify-content: center;
-		gap: 12px;
-		margin-bottom: 36px;
-	}
-	:global(.ph-card) {
-		width: 64px;
-		height: 90px;
-		border-radius: 10px;
-		border: 2px dashed var(--border);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 30px;
-		color: var(--ink-faint);
-		font-weight: 800;
-	}
 	:global(.hero h1) {
 		font-size: clamp(24px, 3.6vw, 30px);
 		font-weight: 600;

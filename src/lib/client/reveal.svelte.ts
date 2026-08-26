@@ -64,6 +64,12 @@ export type Phase = 'idle' | 'dealing' | 'revealing' | 'done' | 'error';
  *  can affect timing without threading a prop through every choreography function below. */
 export const revealSpeed = $state({ value: 1 });
 
+// How long the deck plays its riffle-riffle-cut shuffle before the first card deals — real time,
+// not scaled by revealSpeed the way sleep()'s delays are (the CSS keyframes in +page.svelte/
+// dev/reveal driving the actual motion have their own fixed duration too, same limitation as the
+// 420ms card-flip transition elsewhere). Kept roughly matched to that CSS duration at 1x.
+const SHUFFLE_DURATION = 900;
+
 export function createRevealEngine() {
 	let phase = $state<Phase>('idle');
 	let deal = $state<ScoredDeal | null>(null);
@@ -72,6 +78,7 @@ export function createRevealEngine() {
 	let scoredStreets = $state<Street[]>([]);
 	let runningTotal = $state(0);
 	let error = $state<string | null>(null);
+	let shuffling = $state(false);
 
 	let currentBest = $derived(
 		deal && revealedStreets.length ? deal.perStreetEp[revealedStreets[revealedStreets.length - 1]].category : null
@@ -264,6 +271,16 @@ export function createRevealEngine() {
 		phase = 'done';
 	}
 
+	/** Plays the deck's riffle-riffle-cut shuffle — call in parallel with the /deal fetch (not
+	 *  awaited on its own) so it masks network latency instead of adding to it. The `shuffling`
+	 *  flag just toggles a CSS class; the actual motion lives in +page.svelte/dev/reveal's
+	 *  .deck.shuffling keyframes. */
+	async function shuffleDeck(): Promise<void> {
+		shuffling = true;
+		await sleep(SHUFFLE_DURATION);
+		shuffling = false;
+	}
+
 	/** Skips straight to the finished state — used for a reload (deal already committed today) and
 	 *  for prefers-reduced-motion, neither of which should sit through the ~25s reveal. */
 	function showFinalInstantly(result: ScoredDeal) {
@@ -305,6 +322,9 @@ export function createRevealEngine() {
 		get currentBest() {
 			return currentBest;
 		},
+		get shuffling() {
+			return shuffling;
+		},
 		cardAt,
 		/** Call right before kicking off a fetch for a new deal. */
 		startDealing() {
@@ -315,6 +335,7 @@ export function createRevealEngine() {
 			error = message;
 			phase = 'error';
 		},
+		shuffleDeck,
 		playReveal,
 		showFinalInstantly
 	};
