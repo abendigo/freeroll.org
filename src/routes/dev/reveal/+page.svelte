@@ -85,6 +85,15 @@
 	{/if}
 
 	<div class="table">
+		{#if engine.deal}
+			<!-- Every dealt card flies from here — see DECK_Y_BOARD/DECK_Y_HOLE in reveal.svelte.ts.
+			     Only shown once dealing actually starts, not in the idle state. -->
+			<div class="deck">
+				<div class="deck-card"></div>
+				<div class="deck-card"></div>
+				<div class="deck-card"></div>
+			</div>
+		{/if}
 		<!-- Board above hole cards — poker-video-game layout, board is the shared/community state
 		     so it reads top, the player's own cards sit below it. -->
 		<div class="table-row board-row">
@@ -216,6 +225,32 @@
 		bottom: 6px;
 		width: 38px;
 		height: 52px;
+	}
+	.deck {
+		position: relative;
+		width: 38px;
+		height: 52px;
+		margin-bottom: 22px;
+	}
+	.deck-card {
+		position: absolute;
+		inset: 0;
+		border-radius: 7px;
+		border: 1px solid var(--border);
+		box-shadow: var(--shadow);
+		background: repeating-linear-gradient(
+			45deg,
+			var(--border),
+			var(--border) 3px,
+			var(--surface) 3px,
+			var(--surface) 7px
+		);
+	}
+	.deck-card:nth-child(1) {
+		transform: translate(-2px, 2px);
+	}
+	.deck-card:nth-child(2) {
+		transform: translate(-1px, 1px);
 	}
 	.raw {
 		margin-top: 28px;

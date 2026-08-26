@@ -21,9 +21,29 @@ export interface ScoredDeal {
 }
 
 // Card width + row gap for each row — kept in sync with Card.svelte's .hole/.board sizes. Used to
-// compute how far a card has to slide to land on top of slot 0 (the "pile" spot).
+// compute how far a card has to slide to land on top of slot 0 (the "pile" spot), and — combined
+// with DECK_Y below — how far it has to fan out from the deck to reach its own slot on deal-in.
 export const HOLE_SPACING = 66; // 56px card + 10px gap
 export const BOARD_SPACING = 58; // 48px card + 10px gap
+
+// The deck (see .deck in +page.svelte/dev/reveal's markup) sits center-top, above the board row.
+// Every dealt card's on-mount position is expressed as an offset from *its own slot*, so a card
+// "coming from the deck" needs that offset computed back from the deck's position: horizontally,
+// pulled toward row-center (slot 0 of a centered N-card row sits (N-1)/2 slots off-center);
+// vertically, however far the deck sits above that row. Hole cards travel further than board
+// cards because the hole row sits below the board row, past it.
+const DECK_Y_BOARD = -90;
+const DECK_Y_HOLE = -190;
+
+function dealStartX(role: 'hole' | 'board', slot: number): number {
+	const spacing = role === 'hole' ? HOLE_SPACING : BOARD_SPACING;
+	const rowSize = role === 'hole' ? 2 : 5;
+	return -(slot - (rowSize - 1) / 2) * spacing;
+}
+
+function dealStartY(role: 'hole' | 'board'): number {
+	return role === 'hole' ? DECK_Y_HOLE : DECK_Y_BOARD;
+}
 
 export interface CardVM {
 	id: string;
@@ -74,12 +94,22 @@ export function createRevealEngine() {
 		return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 	}
 
-	/** Deals one or more cards into their slots at once: each mounts off the top of its slot,
-	 *  face down, then falls into place, staggered so a multi-card deal doesn't land as one sound. */
-	async function dealBatch(entries: { role: CardVM['role']; slot: number; code: string }[]) {
+	/** Deals one or more cards into their slots at once: each mounts at the deck (see DECK_Y_*
+	 *  above), face down, then flies out to its own slot, staggered so a multi-card deal doesn't
+	 *  land as one sound. `role` is always 'hole' or 'board' here — burns have their own path. */
+	async function dealBatch(entries: { role: 'hole' | 'board'; slot: number; code: string }[]) {
 		const ids = entries.map(({ role, slot, code }) => {
 			const id = `${role}-${slot}`;
-			cards.push({ id, role, slot, code, faceUp: false, x: 0, y: -70, rot: slot % 2 ? 6 : -6 });
+			cards.push({
+				id,
+				role,
+				slot,
+				code,
+				faceUp: false,
+				x: dealStartX(role, slot),
+				y: dealStartY(role),
+				rot: slot % 2 ? 6 : -6
+			});
 			return id;
 		});
 		await nextFrame();
@@ -87,6 +117,7 @@ export function createRevealEngine() {
 			setTimeout(() => {
 				playSound(n % 2 === 0 ? 'deal1' : 'deal2');
 				const c = cards.find((c) => c.id === id)!;
+				c.x = 0;
 				c.y = 0;
 				c.rot = 0;
 			}, ms(n * 150));
@@ -95,13 +126,19 @@ export function createRevealEngine() {
 	}
 
 	/** A card slides from the deck to the discard pile, face down, and stays there. Each burn
-	 *  lands with a small offset from the last so they visibly stack rather than overlap exactly. */
+	 *  lands with a small offset from the last so they visibly stack rather than overlap exactly.
+	 *  Starts pulled toward the deck (up and left of the muck, which sits at the board row's right
+	 *  edge) rather than dropping straight down, same as the hole/board deal-in. */
 	async function burnCard(slot: number) {
 		const id = `burn-${slot}`;
-		cards.push({ id, role: 'burn', slot, code: '2s', faceUp: false, x: slot * 6, y: -70, rot: -4 });
+		const landX = slot * 6;
+		const landY = slot * 5;
+		cards.push({ id, role: 'burn', slot, code: '2s', faceUp: false, x: landX - 80, y: -160, rot: -4 });
 		await nextFrame();
 		playSound('slide1', { gain: 0.6 });
-		cards.find((c) => c.id === id)!.y = slot * 5;
+		const c = cards.find((c) => c.id === id)!;
+		c.x = landX;
+		c.y = landY;
 		await sleep(420);
 	}
 
