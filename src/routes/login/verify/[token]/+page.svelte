@@ -1,7 +1,16 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	// Refreshes just the header's signed-in state (see the 'app:user' depends() in
+	// +layout.server.ts) — not invalidateAll(), which would re-run this page's own load and
+	// re-verify the (now single-use, already-consumed) token, turning the success we just got
+	// into an "already used" error.
+	$effect(() => {
+		if (data.success) invalidate('app:user');
+	});
 </script>
 
 <svelte:head>
