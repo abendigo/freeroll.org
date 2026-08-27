@@ -155,7 +155,7 @@
 					<MiniCards holeCards={data.featured.holeCards} board={data.featured.board} />
 					<div class="stat-headline">{data.featured.handRank.toUpperCase()}</div>
 				</div>
-				<div class="dealt-by">dealt to <strong>{data.featured.nickname}</strong></div>
+				<div class="dealt-by">dealt to <strong><a href="/u/{data.featured.nickname}">{data.featured.nickname}</a></strong></div>
 				{#if data.featured.achievedOn}
 					<div class="flavor-line">{STREET_VERB[data.featured.achievedOn]}</div>
 				{/if}
