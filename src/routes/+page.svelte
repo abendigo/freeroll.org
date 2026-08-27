@@ -139,7 +139,7 @@
 			<div class="eyebrow">Today's best deal</div>
 			{#if data.featured}
 				<div class="glow-box">
-					<MiniCards holeCards={data.featured.holeCards} />
+					<MiniCards holeCards={data.featured.holeCards} board={data.featured.board} />
 					<div class="stat-headline">{data.featured.handRank.toUpperCase()}</div>
 				</div>
 				<div class="dealt-by">dealt to <strong>{data.featured.nickname}</strong></div>
