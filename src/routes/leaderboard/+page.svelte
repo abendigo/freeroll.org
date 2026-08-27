@@ -56,7 +56,7 @@
 						{#each rows as row (row.rank)}
 							<tr class:you={data.user?.nickname === row.nickname}>
 								<td class="rank">{row.rank}</td>
-								<td>{row.nickname}{data.user?.nickname === row.nickname ? ' (you)' : ''}</td>
+								<td><a href="/u/{row.nickname}">{row.nickname}</a>{data.user?.nickname === row.nickname ? ' (you)' : ''}</td>
 								<td><MiniCards holeCards={row.holeCards} board={row.board} size="tiny" /></td>
 								<td>{row.handRank}</td>
 								<td class="ep mono">{row.totalEp.toLocaleString()}</td>
