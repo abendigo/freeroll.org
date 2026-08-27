@@ -36,6 +36,9 @@
 		{:else if form?.saved}
 			<p class="success">Saved.</p>
 		{/if}
+		{#if data.user.nickname}
+			<p style="margin-top: 24px;"><a href="/u/{data.user.nickname}">View your public profile</a></p>
+		{/if}
 		<p style="margin-top: 24px;"><a href="/">Skip for now — back to Freeroll</a></p>
 		<form method="POST" action="/logout" style="margin-top: 8px;">
 			<button class="btn-outline" type="submit">Sign out</button>
