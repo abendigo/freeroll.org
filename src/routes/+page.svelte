@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
+	import MiniCards from '$lib/components/MiniCards.svelte';
 	import { preloadSounds, playSound, soundState } from '$lib/client/sounds.svelte';
 	import { createRevealEngine, type ScoredDeal } from '$lib/client/reveal.svelte';
 	import type { PageProps } from './$types';
@@ -7,6 +8,10 @@
 	let { data }: PageProps = $props();
 
 	const engine = createRevealEngine();
+
+	// How poker players actually talk about the street a hand came together on — mirrors the
+	// `achievedOn` street featuredDealToday derives server-side from the deal's own per-street EP.
+	const STREET_VERB: Record<string, string> = { preflop: 'dealt preflop', flop: 'flopped', turn: 'turned', river: 'rivered' };
 
 	async function handleDeal() {
 		engine.startDealing();
@@ -132,23 +137,23 @@
 
 		<div class="featured" id="board">
 			<div class="eyebrow">Today's best deal</div>
-			<div class="glow-box">
-				<div class="hole-row">
-					<div class="mini-card"><span>8</span><span>♠</span></div>
-					<div class="mini-card red"><span>8</span><span>♥</span></div>
+			{#if data.featured}
+				<div class="glow-box">
+					<MiniCards holeCards={data.featured.holeCards} board={data.featured.board} />
+					<div class="stat-headline">{data.featured.handRank.toUpperCase()}</div>
 				</div>
-				<div class="stat-headline">FULL HOUSE</div>
-			</div>
-			<div class="dealt-by">dealt to <strong>riverrat</strong><span class="like-pill">♡ 812</span></div>
-			<div class="flavor-line">boat over kings, flopped, no apologies</div>
-			<div class="pill-row">
-				<span class="pill hand">🏠 Full House</span>
-				<span class="pill meme">⚡ Flopped It</span>
-				<span class="pill board">🎯 Paired Flop</span>
-			</div>
-			<span class="ep-pill mono">8,420 EP</span>
-			<!-- svelte-ignore a11y_invalid_attribute -- placeholder, real leaderboard link comes with the app (later PR) -->
-			<a class="deals-today mono" href="#">1,204 deals today</a>
+				<div class="dealt-by">dealt to <strong>{data.featured.nickname}</strong></div>
+				{#if data.featured.achievedOn}
+					<div class="flavor-line">{STREET_VERB[data.featured.achievedOn]}</div>
+				{/if}
+				<span class="ep-pill mono">{data.featured.totalEp.toLocaleString()} EP</span>
+			{:else}
+				<div class="glow-box">
+					<div class="stat-headline">?</div>
+				</div>
+				<div class="dealt-by">nobody signed in has dealt today — could be you</div>
+			{/if}
+			<a class="deals-today mono" href="/leaderboard">{data.dealsToday.toLocaleString()} deals today</a>
 		</div>
 	</div>
 </section>

@@ -28,3 +28,15 @@ export function getOrCreateAnonId(cookies: Cookies): string {
 export function todayUtc(): string {
 	return new Date().toISOString().slice(0, 10);
 }
+
+/** The current UTC week as a [Monday, Sunday] inclusive range of `deals.date` strings — the
+ *  boundary for the weekly leaderboard, kept consistent with the UTC daily reset above rather
+ *  than drifting with the viewer's local timezone. */
+export function currentUtcWeekRange(): { start: string; end: string } {
+	const now = new Date();
+	const day = now.getUTCDay(); // 0 (Sun) .. 6 (Sat)
+	const mondayOffset = day === 0 ? -6 : 1 - day;
+	const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + mondayOffset));
+	const sunday = new Date(Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate() + 6));
+	return { start: monday.toISOString().slice(0, 10), end: sunday.toISOString().slice(0, 10) };
+}

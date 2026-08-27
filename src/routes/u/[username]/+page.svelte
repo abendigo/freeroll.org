@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { parseCardCode } from '$lib/cards';
+	import MiniCards from '$lib/components/MiniCards.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -56,40 +56,41 @@
 		{#if data.deals.length === 0}
 			<p style="color: var(--ink-muted);">No hands dealt yet.</p>
 		{:else}
-			<table class="board">
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>Hand</th>
-						<th>Result</th>
-						<th style="text-align:right;">EP</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each data.deals as deal (deal.date)}
+			<div class="table-scroll">
+				<table class="board">
+					<thead>
 						<tr>
-							<td class="mono">{formatDate(deal.date)}</td>
-							<td>
-								<div class="hole-row" style="justify-content:flex-start; margin-bottom:0;">
-									{#each deal.holeCards as code (code)}
-										{@const card = parseCardCode(code)}
-										<div class="mini-card" class:red={card.red}>
-											<span>{card.rank}</span><span>{card.suit}</span>
-										</div>
-									{/each}
-								</div>
-							</td>
-							<td>{deal.handRank}</td>
-							<td class="ep mono">{deal.totalEp.toLocaleString()}</td>
+							<th>Date</th>
+							<th>Cards</th>
+							<th>Result</th>
+							<th style="text-align:right;">EP</th>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{#each data.deals as deal (deal.date)}
+							<tr>
+								<td class="mono">{formatDate(deal.date)}</td>
+								<td><MiniCards holeCards={deal.holeCards} board={deal.board} size="tiny" /></td>
+								<td>{deal.handRank}</td>
+								<td class="ep mono">{deal.totalEp.toLocaleString()}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		{/if}
 	</div>
 </section>
 
 <style>
+	/* 7 mini-cards (hole + board) plus Date/Result/EP doesn't fit a narrow phone at font-size —
+	   scroll the table itself rather than let the columns squash. */
+	.table-scroll {
+		overflow-x: auto;
+	}
+	:global(.table-scroll table.board) {
+		min-width: 460px;
+	}
 	.profile-stats {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);

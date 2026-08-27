@@ -361,30 +361,6 @@
 		border: 2px solid transparent;
 		animation: -global-spin-glow 7s linear infinite;
 	}
-	:global(.hole-row) {
-		display: flex;
-		justify-content: center;
-		gap: 6px;
-		margin-bottom: 10px;
-	}
-	:global(.mini-card) {
-		width: 34px;
-		height: 46px;
-		border-radius: 5px;
-		background: var(--card-face);
-		color: var(--card-ink);
-		border: 1px solid var(--border);
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		padding: 3px 4px;
-		font-size: 12px;
-		font-weight: 700;
-		font-family: Georgia, serif;
-	}
-	:global(.mini-card.red) {
-		color: var(--card-red);
-	}
 	:global(.stat-headline) {
 		font-size: 34px;
 		text-align: center;
@@ -398,17 +374,6 @@
 	}
 	:global(.featured .dealt-by strong) {
 		color: var(--ink);
-	}
-	:global(.like-pill) {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		font-size: 12px;
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		padding: 2px 9px;
-		margin-left: 6px;
-		color: var(--ink-muted);
 	}
 	:global(.flavor-line) {
 		text-align: center;
