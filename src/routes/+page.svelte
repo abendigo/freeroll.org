@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
-	import { parseCardCode } from '$lib/cards';
+	import MiniCards from '$lib/components/MiniCards.svelte';
 	import { preloadSounds, playSound, soundState } from '$lib/client/sounds.svelte';
 	import { createRevealEngine, type ScoredDeal } from '$lib/client/reveal.svelte';
 	import type { PageProps } from './$types';
@@ -139,12 +139,7 @@
 			<div class="eyebrow">Today's best deal</div>
 			{#if data.featured}
 				<div class="glow-box">
-					<div class="hole-row">
-						{#each data.featured.holeCards as code (code)}
-							{@const card = parseCardCode(code)}
-							<div class="mini-card" class:red={card.red}><span>{card.rank}</span><span>{card.suit}</span></div>
-						{/each}
-					</div>
+					<MiniCards holeCards={data.featured.holeCards} />
 					<div class="stat-headline">{data.featured.handRank.toUpperCase()}</div>
 				</div>
 				<div class="dealt-by">dealt to <strong>{data.featured.nickname}</strong></div>

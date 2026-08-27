@@ -5,6 +5,8 @@ import { STREETS, type Street } from './streets';
 export interface LeaderboardEntry {
 	rank: number;
 	nickname: string;
+	holeCards: string[];
+	board: string[];
 	handRank: string;
 	totalEp: number;
 }
@@ -20,7 +22,13 @@ export async function dailyLeaderboard(db: Kysely<AppDatabase>, date: string, li
 	const rows = await db
 		.selectFrom('deals')
 		.innerJoin('users', 'users.id', 'deals.user_id')
-		.select(['users.nickname as nickname', 'deals.hand_rank as handRank', 'deals.total_ep as totalEp'])
+		.select([
+			'users.nickname as nickname',
+			'deals.hole_cards as holeCards',
+			'deals.board as board',
+			'deals.hand_rank as handRank',
+			'deals.total_ep as totalEp'
+		])
 		.where('deals.date', '=', date)
 		.where('users.nickname', 'is not', null)
 		.orderBy('deals.total_ep', 'desc')
@@ -49,6 +57,8 @@ async function bestPerPlayer(
 				.$if(dateRange.to !== undefined, (qb) => qb.where('deals.date', '<=', dateRange.to!))
 				.select([
 					'users.nickname as nickname',
+					'deals.hole_cards as holeCards',
+					'deals.board as board',
 					'deals.hand_rank as handRank',
 					'deals.total_ep as totalEp',
 					// Tie-break by earliest date: the rare exact-EP tie reads better as "who got there
@@ -76,13 +86,23 @@ export function allTimeLeaderboard(db: Kysely<AppDatabase>, limit = DEFAULT_LIMI
 	return bestPerPlayer(db, {}, limit);
 }
 
-function withRank(rows: { nickname: string | null; handRank: string; totalEp: number }[]): LeaderboardEntry[] {
-	return rows.map((row, i) => ({ rank: i + 1, nickname: row.nickname!, handRank: row.handRank, totalEp: row.totalEp }));
+function withRank(
+	rows: { nickname: string | null; holeCards: string; board: string; handRank: string; totalEp: number }[]
+): LeaderboardEntry[] {
+	return rows.map((row, i) => ({
+		rank: i + 1,
+		nickname: row.nickname!,
+		holeCards: JSON.parse(row.holeCards) as string[],
+		board: JSON.parse(row.board) as string[],
+		handRank: row.handRank,
+		totalEp: row.totalEp
+	}));
 }
 
 export interface FeaturedDeal {
 	nickname: string;
 	holeCards: string[];
+	board: string[];
 	handRank: string;
 	totalEp: number;
 	/** Which street the final hand category was first reached on — derived from the deal's own
@@ -100,6 +120,7 @@ export async function featuredDealToday(db: Kysely<AppDatabase>, date: string): 
 		.select([
 			'users.nickname as nickname',
 			'deals.hole_cards as holeCards',
+			'deals.board as board',
 			'deals.hand_rank as handRank',
 			'deals.total_ep as totalEp',
 			'deals.per_street_ep as perStreetEp'
@@ -118,6 +139,7 @@ export async function featuredDealToday(db: Kysely<AppDatabase>, date: string): 
 	return {
 		nickname: row.nickname!,
 		holeCards: JSON.parse(row.holeCards) as string[],
+		board: JSON.parse(row.board) as string[],
 		handRank: row.handRank,
 		totalEp: row.totalEp,
 		achievedOn

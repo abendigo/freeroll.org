@@ -1,4 +1,5 @@
 <script lang="ts">
+	import MiniCards from '$lib/components/MiniCards.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -40,19 +41,30 @@
 				{#if activeTab === 'daily'}Nobody signed in has dealt today — be the first.{:else}Nobody's signed in and dealt yet.{/if}
 			</p>
 		{:else}
-			<table class="board">
-				<thead><tr><th>Rank</th><th>Player</th><th>Best hand</th><th style="text-align:right;">EP</th></tr></thead>
-				<tbody>
-					{#each rows as row (row.rank)}
-						<tr class:you={data.user?.nickname === row.nickname}>
-							<td class="rank">{row.rank}</td>
-							<td>{row.nickname}{data.user?.nickname === row.nickname ? ' (you)' : ''}</td>
-							<td>{row.handRank}</td>
-							<td class="ep mono">{row.totalEp.toLocaleString()}</td>
+			<div class="table-scroll">
+				<table class="board">
+					<thead>
+						<tr>
+							<th>Rank</th>
+							<th>Player</th>
+							<th>Cards</th>
+							<th>Best hand</th>
+							<th style="text-align:right;">EP</th>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{#each rows as row (row.rank)}
+							<tr class:you={data.user?.nickname === row.nickname}>
+								<td class="rank">{row.rank}</td>
+								<td>{row.nickname}{data.user?.nickname === row.nickname ? ' (you)' : ''}</td>
+								<td><MiniCards holeCards={row.holeCards} board={row.board} size="tiny" /></td>
+								<td>{row.handRank}</td>
+								<td class="ep mono">{row.totalEp.toLocaleString()}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		{/if}
 		<div class="board-note">{activeNote} Anonymous plays don't appear — sign in and pick a nickname to get on the board.</div>
 	</div>
@@ -91,6 +103,14 @@
 	.empty {
 		color: var(--ink-muted);
 		font-size: 14px;
+	}
+	/* Rank + Player + 7 mini-cards + Best hand + EP doesn't fit a narrow phone at font-size — scroll
+	   the table itself rather than let the columns squash. */
+	.table-scroll {
+		overflow-x: auto;
+	}
+	:global(.table-scroll table.board) {
+		min-width: 480px;
 	}
 	:global(table.board tr.you) {
 		background: color-mix(in srgb, var(--glow-c) 6%, transparent);
