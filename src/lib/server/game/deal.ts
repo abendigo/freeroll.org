@@ -68,6 +68,15 @@ function scoreDeal(hole: Card[], board: Card[]): { perStreetEp: Record<Street, S
 
 export type DealIdentity = { userId: number } | { anonId: string };
 
+/** Read-only lookup, no commit — for the homepage to render straight into the finished state
+ *  (see showFinalInstantly) on a plain page load, instead of making the visitor click Deal again
+ *  just to be told they already dealt today. Deliberately separate from dealForIdentity: this
+ *  must never create a deal or mint an anon cookie just because someone loaded the homepage. */
+export async function findTodaysDeal(db: Kysely<AppDatabase>, identity: DealIdentity, today: string): Promise<ScoredDeal | null> {
+	const existing = await findExisting(db, identity, today);
+	return existing ? toScoredDeal(existing, true) : null;
+}
+
 function ownerColumns(identity: DealIdentity): { user_id: number | null; anon_id: string | null } {
 	return 'userId' in identity
 		? { user_id: identity.userId, anon_id: null }
