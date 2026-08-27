@@ -148,26 +148,28 @@
 			</div>
 		{/if}
 
-		<div class="featured" id="board">
-			<div class="eyebrow">Today's best deal</div>
-			{#if data.featured}
-				<div class="glow-box">
-					<MiniCards holeCards={data.featured.holeCards} board={data.featured.board} />
-					<div class="stat-headline">{data.featured.handRank.toUpperCase()}</div>
-				</div>
-				<div class="dealt-by">dealt to <strong><a href="/u/{data.featured.nickname}">{data.featured.nickname}</a></strong></div>
-				{#if data.featured.achievedOn}
-					<div class="flavor-line">{STREET_VERB[data.featured.achievedOn]}</div>
+		{#if engine.phase === 'idle' || engine.phase === 'error'}
+			<div class="featured" id="board">
+				<div class="eyebrow">Today's best deal</div>
+				{#if data.featured}
+					<div class="glow-box">
+						<MiniCards holeCards={data.featured.holeCards} board={data.featured.board} />
+						<div class="stat-headline">{data.featured.handRank.toUpperCase()}</div>
+					</div>
+					<div class="dealt-by">dealt to <strong><a href="/u/{data.featured.nickname}">{data.featured.nickname}</a></strong></div>
+					{#if data.featured.achievedOn}
+						<div class="flavor-line">{STREET_VERB[data.featured.achievedOn]}</div>
+					{/if}
+					<span class="ep-pill mono">{data.featured.totalEp.toLocaleString()} EP</span>
+				{:else}
+					<div class="glow-box">
+						<div class="stat-headline">?</div>
+					</div>
+					<div class="dealt-by">nobody signed in has dealt today — could be you</div>
 				{/if}
-				<span class="ep-pill mono">{data.featured.totalEp.toLocaleString()} EP</span>
-			{:else}
-				<div class="glow-box">
-					<div class="stat-headline">?</div>
-				</div>
-				<div class="dealt-by">nobody signed in has dealt today — could be you</div>
-			{/if}
-			<a class="deals-today mono" href="/leaderboard">{data.dealsToday.toLocaleString()} deals today</a>
-		</div>
+				<a class="deals-today mono" href="/leaderboard">{data.dealsToday.toLocaleString()} deals today</a>
+			</div>
+		{/if}
 	</div>
 </section>
 
