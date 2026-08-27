@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import Card from '$lib/components/Card.svelte';
 	import MiniCards from '$lib/components/MiniCards.svelte';
 	import { preloadSounds, playSound, soundState } from '$lib/client/sounds.svelte';
@@ -8,6 +9,18 @@
 	let { data }: PageProps = $props();
 
 	const engine = createRevealEngine();
+
+	// Already dealt today (server-checked in +page.server.ts, read-only) — land straight on the
+	// finished state instead of showing a live-looking Deal button that would just re-fetch this
+	// same result on click. Deliberately a one-shot read of the value `data` had at mount
+	// (`untrack` — same reasoning as reduceMotion in handleDeal below): this engine state is what
+	// drives the reveal from here on, not something that should reset if `data` is later
+	// invalidated for an unrelated reason.
+	const todaysDeal = untrack(() => data.todaysDeal);
+	if (todaysDeal) {
+		engine.deal = todaysDeal;
+		engine.showFinalInstantly(todaysDeal);
+	}
 
 	// How poker players actually talk about the street a hand came together on — mirrors the
 	// `achievedOn` street featuredDealToday derives server-side from the deal's own per-street EP.
