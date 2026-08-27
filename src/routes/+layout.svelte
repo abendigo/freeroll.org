@@ -399,17 +399,6 @@
 	:global(.featured .dealt-by strong) {
 		color: var(--ink);
 	}
-	:global(.like-pill) {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		font-size: 12px;
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		padding: 2px 9px;
-		margin-left: 6px;
-		color: var(--ink-muted);
-	}
 	:global(.flavor-line) {
 		text-align: center;
 		font-size: 13px;
