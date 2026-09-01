@@ -50,6 +50,12 @@ jobs:
           # unhide. PREVIEW_SECRET is the bypass value for /?preview=<secret>.
           echo -n "${{ secrets.COMING_SOON }}" | npx wrangler secret put COMING_SOON --name freeroll-app
           echo -n "${{ secrets.PREVIEW_SECRET }}" | npx wrangler secret put PREVIEW_SECRET --name freeroll-app
+          # Bot traffic simulation — see src/lib/server/bots/ and bot-traffic-tick.yml. Same
+          # usually-unset-is-off shape as COMING_SOON above: BOT_TRAFFIC_ENABLED must be
+          # explicitly "true" for the tick endpoint to do anything at all. BOT_TICK_SECRET is
+          # the bearer credential the tick workflow presents.
+          echo -n "${{ secrets.BOT_TRAFFIC_ENABLED }}" | npx wrangler secret put BOT_TRAFFIC_ENABLED --name freeroll-app
+          echo -n "${{ secrets.BOT_TICK_SECRET }}" | npx wrangler secret put BOT_TICK_SECRET --name freeroll-app
           # Production only — PR previews deliberately don't get these, so test traffic never
           # pollutes real analytics.
           echo -n "${{ secrets.PUBLIC_UMAMI_URL }}" | npx wrangler secret put PUBLIC_UMAMI_URL --name freeroll-app

@@ -1,0 +1,25 @@
+name: Bot Traffic Tick
+
+# Simulated daily-deal traffic — see src/lib/server/bots/. Deliberately its own workflow, not
+# part of deploy-app.yml: disabling this from the Actions tab (... -> Disable workflow) is a
+# complete, independent off switch that needs no code change, no redeploy, and touches nothing
+# else. (BOT_TRAFFIC_ENABLED unset on the worker is the other independent off switch — see
+# src/lib/server/bots/config.ts.)
+on:
+  schedule:
+    # Every 5 minutes — comfortably under the 10-minute idle threshold the tick endpoint checks
+    # itself, so occasional GitHub Actions scheduling delay doesn't matter.
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit the bot tick endpoint
+        # ?preview=... gets past the site-wide coming-soon gate (src/hooks.server.ts), same as
+        # a human bypass link — unrelated to whether bots are actually enabled or authorized,
+        # which the endpoint itself checks via BOT_TRAFFIC_ENABLED + the bearer secret below.
+        run: |
+          curl -sf -X POST "https://freeroll.org/internal/bots/tick?preview=${{ secrets.PREVIEW_SECRET }}" \
+            -H "Authorization: Bearer ${{ secrets.BOT_TICK_SECRET }}"

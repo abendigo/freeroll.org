@@ -13,6 +13,9 @@ export interface UsersTable {
 	email_hash: string;
 	nickname: string | null;
 	created_at: Generated<string>;
+	// Simulated-traffic accounts — see src/lib/server/bots/. Defaults to 0 for every real
+	// signup; only ensureBotAccountsExist() ever inserts a 1.
+	is_bot: Generated<number>;
 }
 
 export interface MagicLinkTokensTable {
