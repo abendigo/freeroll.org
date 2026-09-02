@@ -1,4 +1,5 @@
 <script lang="ts">
+	import BadgeGrid from '$lib/components/BadgeGrid.svelte';
 	import MiniCards from '$lib/components/MiniCards.svelte';
 	import type { PageProps } from './$types';
 
@@ -43,6 +44,22 @@
 				<div class="profile-stat-label">Hands dealt</div>
 			</div>
 		</div>
+	</div>
+</section>
+
+<section class="section">
+	<div class="wrap">
+		<div class="section-head">
+			<div class="eyebrow">Collection</div>
+			<h2>Starting hands</h2>
+			<p>
+				{data.holeCardBadgesEarned === data.holeCardBadgeCount
+					? 'Every hand in the deck.'
+					: `${data.holeCardBadgesEarned} of ${data.holeCardBadgeCount} dealt.`}
+			</p>
+		</div>
+
+		<BadgeGrid earned={data.earnedBadges} />
 	</div>
 </section>
 

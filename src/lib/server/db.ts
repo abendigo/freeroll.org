@@ -58,6 +58,14 @@ export interface DealsTable {
 	created_at: Generated<string>;
 }
 
+export interface UserBadgesTable {
+	id: Generated<number>;
+	user_id: number;
+	badge_id: string;
+	first_earned_date: string;
+	created_at: Generated<string>;
+}
+
 export interface AppDatabase {
 	users: UsersTable;
 	magic_link_tokens: MagicLinkTokensTable;
@@ -65,6 +73,7 @@ export interface AppDatabase {
 	login_attempts: LoginAttemptsTable;
 	migrations: MigrationsTable;
 	deals: DealsTable;
+	user_badges: UserBadgesTable;
 }
 
 // Local dev talks to a plain SQLite file on disk (no Turso account needed to develop).

@@ -1,5 +1,6 @@
 import type { Kysely } from 'kysely';
 import type { AppDatabase } from '../db';
+import { awardHoleCardBadges } from './badges';
 import { buildDeck, cardCode, shuffle, type Card } from './cards';
 import { bestCategory, CATEGORY, CATEGORY_NAMES, type Category } from './evaluator';
 import { firstReachProbability, surprisal } from './ep-tables';
@@ -142,6 +143,13 @@ export async function dealForIdentity(db: Kysely<AppDatabase>, identity: DealIde
 		const winner = await findExisting(db, identity, today);
 		if (!winner) throw err;
 		return toScoredDeal(winner, true);
+	}
+
+	// Badges only ever come from a genuinely fresh deal (this is the one return path with
+	// alreadyDealt: false) and only for a signed-in identity — see awardHoleCardBadges' own
+	// comment for why anonymous play is excluded, not just deferred.
+	if ('userId' in identity) {
+		await awardHoleCardBadges(db, identity.userId, holeCards as [string, string], today);
 	}
 
 	return { holeCards, board: boardCodes, perStreetEp, totalEp, handRank, alreadyDealt: false };

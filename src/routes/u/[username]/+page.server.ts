@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { HOLE_CARD_BADGES } from '$lib/badges';
 import { db } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
 
@@ -36,12 +37,26 @@ export const load: PageServerLoad = async ({ params }) => {
 		null
 	);
 
+	// { "AKs": "2026-08-30", ... } — every badge this profile has ever earned, hole-card and meta
+	// alike, keyed by id so BadgeGrid can look up "earned or not" (and when) per cell in O(1).
+	const badgeRows = await db
+		.selectFrom('user_badges')
+		.select(['badge_id', 'first_earned_date'])
+		.where('user_id', '=', user.id)
+		.execute();
+	const earnedBadges = Object.fromEntries(badgeRows.map((row) => [row.badge_id, row.first_earned_date]));
+	const holeCardBadgeIds = Object.keys(HOLE_CARD_BADGES);
+	const holeCardBadgesEarned = holeCardBadgeIds.filter((id) => id in earnedBadges).length;
+
 	return {
 		nickname: user.nickname,
 		memberSince: user.created_at,
 		dealsPlayed: deals.length,
 		totalEp,
 		best,
-		deals
+		deals,
+		earnedBadges,
+		holeCardBadgesEarned,
+		holeCardBadgeCount: holeCardBadgeIds.length
 	};
 };
