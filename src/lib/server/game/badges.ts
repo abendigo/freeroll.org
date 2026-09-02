@@ -41,3 +41,48 @@ export async function awardHoleCardBadges(
 		}
 	}
 }
+
+/**
+ * One-time (but safe to rerun) backfill: replays awardHoleCardBadges over every deal that
+ * already exists, so accounts that played before this feature shipped don't show an empty
+ * collection. Reuses awardHoleCardBadges unmodified, called once per historical deal in
+ * ascending date order per user — the exact sequence live play would have produced had badges
+ * existed from day one, so first_earned_date lands on the real date each hand was first dealt,
+ * not the backfill's run date. anon_id deals are excluded, same as live play (see
+ * awardHoleCardBadges' own comment on why anonymous play never earns badges).
+ *
+ * Idempotent: awardHoleCardBadges only ever inserts a badge that isn't already earned, so
+ * rerunning this — including after real play has started awarding badges live — just fills in
+ * whatever's still missing and touches nothing that's already there.
+ */
+export async function backfillHoleCardBadges(
+	db: Kysely<AppDatabase>
+): Promise<{ usersProcessed: number; badgesAwarded: number }> {
+	const rows = await db
+		.selectFrom('deals')
+		.select(['user_id', 'date', 'hole_cards'])
+		.where('user_id', 'is not', null)
+		.orderBy('user_id', 'asc')
+		.orderBy('date', 'asc')
+		.execute();
+
+	const byUser = new Map<number, { date: string; holeCards: [string, string] }[]>();
+	for (const row of rows) {
+		const userId = row.user_id!;
+		const deals = byUser.get(userId) ?? [];
+		deals.push({ date: row.date, holeCards: JSON.parse(row.hole_cards) as [string, string] });
+		byUser.set(userId, deals);
+	}
+
+	const countBefore = await db.selectFrom('user_badges').select(({ fn }) => fn.countAll<number>().as('n')).executeTakeFirst();
+
+	for (const [userId, deals] of byUser) {
+		for (const deal of deals) {
+			await awardHoleCardBadges(db, userId, deal.holeCards, deal.date);
+		}
+	}
+
+	const countAfter = await db.selectFrom('user_badges').select(({ fn }) => fn.countAll<number>().as('n')).executeTakeFirst();
+
+	return { usersProcessed: byUser.size, badgesAwarded: (countAfter?.n ?? 0) - (countBefore?.n ?? 0) };
+}
