@@ -29,9 +29,23 @@ export async function runMigrations(migrationFiles: Record<string, string>): Pro
 	for (const name of names) {
 		if (applied.has(name)) continue;
 
-		await client.executeMultiple(migrationFiles[name]);
-		await db.insertInto('migrations').values({ name, applied_at: new Date().toISOString() }).execute();
-
-		console.log(`Applied migration: ${name}`);
+		try {
+			await client.executeMultiple(migrationFiles[name]);
+			await db.insertInto('migrations').values({ name, applied_at: new Date().toISOString() }).execute();
+			console.log(`Applied migration: ${name}`);
+		} catch (err) {
+			// Lost a race against a concurrent isolate also cold-starting against the same DB —
+			// migrationsReady only dedupes concurrent requests *within* one isolate (see its own
+			// comment); Cloudflare Workers can spin up several isolates at once on a fresh deploy,
+			// each with its own copy of that cache, all reaching this loop independently. Every
+			// migration here is written to tolerate being attempted twice (CREATE ... IF NOT
+			// EXISTS, or an ALTER that's already landed) — so if this name is now recorded, some
+			// other isolate's attempt is the one that actually won, and this failure is just that
+			// race, not a real problem. Only a migration that's still unrecorded after losing is a
+			// genuine failure worth surfacing.
+			const nowApplied = await db.selectFrom('migrations').select('name').where('name', '=', name).executeTakeFirst();
+			if (!nowApplied) throw err;
+			console.log(`Skipped migration ${name}: already applied by a concurrent isolate.`);
+		}
 	}
 }
