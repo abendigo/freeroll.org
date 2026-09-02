@@ -3,9 +3,13 @@
 	// Its own tiny Worker, deliberately separate from freeroll-app — see index.js for why.
 	"name": "freeroll-bot-tick",
 	"compatibility_date": "2026-08-24",
-	"main": "index.js",
-	"triggers": {
-		// Every 5 minutes, same interval bot-traffic-tick.yml used to (unreliably) aim for.
-		"crons": ["*/5 * * * *"]
-	}
+	"main": "index.js"
+	// Cron Trigger temporarily removed here — Cloudflare's own dashboard/API confirmed the
+	// */5 * * * * schedule was registered correctly (GET .../schedules showed it, deploy logs
+	// confirmed it) but never actually fired once in 8+ hours: GraphQL invocation analytics for
+	// freeroll-bot-tick showed zero cron-sourced invocations the whole time. That's a stuck
+	// registration on Cloudflare's side, not a config problem. Clearing it via a deploy with no
+	// `triggers` key (this commit), then restoring it in a following commit, forces a real
+	// delete+recreate cycle instead of the no-op re-PUT a second `wrangler deploy` of the same
+	// config would do. See bot-traffic-simulation memory / PR #25 for the full history.
 }
