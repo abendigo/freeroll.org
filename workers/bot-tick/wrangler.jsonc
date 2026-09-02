@@ -4,17 +4,13 @@
 	"name": "freeroll-bot-tick",
 	"compatibility_date": "2026-08-24",
 	"main": "index.js",
-	// Cron Trigger temporarily emptied here — Cloudflare's own dashboard/API confirmed the
-	// */5 * * * * schedule was registered correctly (GET .../schedules showed it, deploy logs
-	// confirmed it) but never actually fired once in 8+ hours: GraphQL invocation analytics for
-	// freeroll-bot-tick showed zero cron-sourced invocations the whole time. That's a stuck
-	// registration on Cloudflare's side, not a config problem. An explicit `crons: []` (this
-	// commit) is required to actually clear it — dropping the `triggers` key entirely turned out
-	// to be a no-op, not a clear, confirmed via the schedules API after that deploy. A following
-	// commit restores the real cron, completing a genuine delete+recreate cycle instead of the
-	// no-op re-PUT a second identical `wrangler deploy` would do. See bot-traffic-simulation
-	// memory / PR #25 for the full history.
 	"triggers": {
-		"crons": []
+		// Every 5 minutes, same interval bot-traffic-tick.yml used to (unreliably) aim for.
+		// Re-registered 2026-09-02 ~22:10 UTC after the original registration (13:24 UTC) never
+		// fired once in 8+ hours despite showing correctly in the schedules API — a stuck
+		// registration on Cloudflare's side. Confirmed cleared to `crons: []` first (verified via
+		// the schedules API) before restoring it here, for a genuine delete+recreate rather than
+		// a no-op re-PUT of the same value. See bot-traffic-simulation memory / PR #25.
+		"crons": ["*/5 * * * *"]
 	}
 }
