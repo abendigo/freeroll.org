@@ -9,9 +9,9 @@ export function botsEnabled(): boolean {
 	return env.BOT_TRAFFIC_ENABLED === 'true';
 }
 
-/** Bearer credential .github/workflows/bot-traffic-tick.yml presents to POST /internal/bots/
- *  tick. A second, independent gate on top of botsEnabled(): flipping the feature on doesn't
- *  by itself make the endpoint callable by anyone who finds the URL. */
+/** Bearer credential workers/bot-tick/ presents to POST /internal/bots/tick. A second,
+ *  independent gate on top of botsEnabled(): flipping the feature on doesn't by itself make
+ *  the endpoint callable by anyone who finds the URL. */
 export function botTickSecret(): string | undefined {
 	return env.BOT_TICK_SECRET;
 }

@@ -1,0 +1,11 @@
+{
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	// Its own tiny Worker, deliberately separate from freeroll-app — see index.js for why.
+	"name": "freeroll-bot-tick",
+	"compatibility_date": "2026-08-24",
+	"main": "index.js",
+	"triggers": {
+		// Every 5 minutes, same interval bot-traffic-tick.yml used to (unreliably) aim for.
+		"crons": ["*/5 * * * *"]
+	}
+}

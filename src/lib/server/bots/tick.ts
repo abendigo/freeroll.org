@@ -11,7 +11,7 @@ export type TickResult =
 /** The watchdog: if no deal — real or bot — has landed in the last IDLE_THRESHOLD_MINUTES,
  *  deals for one random bot that hasn't already dealt today. No-ops otherwise, so a busy day
  *  of real traffic just keeps resetting the idle clock exactly like a bot deal would. Called
- *  from POST /internal/bots/tick, on a fixed interval, by bot-traffic-tick.yml. */
+ *  from POST /internal/bots/tick, on a fixed interval, by workers/bot-tick/. */
 export async function runBotTick(db: Kysely<AppDatabase>): Promise<TickResult> {
 	const today = todayUtc();
 

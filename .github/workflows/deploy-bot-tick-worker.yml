@@ -1,0 +1,44 @@
+name: Deploy Bot Tick Worker
+
+# Deploys workers/bot-tick/ — the Cron Trigger Worker that pings POST /internal/bots/tick on a
+# schedule. Split from deploy-app.yml since it's a separate Cloudflare Worker with its own
+# wrangler config; see workers/bot-tick/index.js for why it isn't folded into freeroll-app.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "workers/bot-tick/**"
+      - ".github/workflows/deploy-bot-tick-worker.yml"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Only for the pinned `wrangler` binary the "Set worker secrets" step below shells out
+      # to via npx — wrangler-action deploys with its own bundled wrangler, so this install
+      # doesn't gate that step.
+      - run: npm ci
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: workers/bot-tick
+          command: deploy
+
+      - name: Set worker secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo -n "${{ secrets.BOT_TICK_SECRET }}" | npx wrangler secret put BOT_TICK_SECRET --name freeroll-bot-tick
+          echo -n "${{ secrets.PREVIEW_SECRET }}" | npx wrangler secret put PREVIEW_SECRET --name freeroll-bot-tick
