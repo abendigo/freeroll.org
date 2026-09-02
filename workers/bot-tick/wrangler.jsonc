@@ -6,11 +6,6 @@
 	"main": "index.js",
 	"triggers": {
 		// Every 5 minutes, same interval bot-traffic-tick.yml used to (unreliably) aim for.
-		// Re-registered 2026-09-02 ~22:10 UTC after the original registration (13:24 UTC) never
-		// fired once in 8+ hours despite showing correctly in the schedules API — a stuck
-		// registration on Cloudflare's side. Confirmed cleared to `crons: []` first (verified via
-		// the schedules API) before restoring it here, for a genuine delete+recreate rather than
-		// a no-op re-PUT of the same value. See bot-traffic-simulation memory / PR #25.
 		"crons": ["*/5 * * * *"]
 	}
 }

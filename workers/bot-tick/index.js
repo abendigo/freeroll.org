@@ -12,38 +12,13 @@
 // @sveltejs/adapter-cloudflare generates a fetch-only `_worker.js` on every build, which would
 // clobber a hand-added `scheduled` export — see the PR that introduced this file for the
 // investigation. A second tiny Worker sidesteps that entirely.
-
-function tick(env) {
-	return fetch(`https://freeroll.org/internal/bots/tick?preview=${env.PREVIEW_SECRET}`, {
-		method: 'POST',
-		headers: { Authorization: `Bearer ${env.BOT_TICK_SECRET}` }
-	});
-}
-
 export default {
 	async scheduled(event, env, ctx) {
-		ctx.waitUntil(tick(env));
-	},
-
-	// Temporary diagnostic, added while investigating why no bot deal landed for 35+ minutes
-	// despite the Cron Trigger registering correctly on deploy — lets a manual `curl` fire the
-	// exact same call the schedule does and see the real upstream response, since this sandbox
-	// has no Cloudflare API token to check dashboard/tail directly. Deliberately unauthenticated
-	// (no secret to gate it with is knowable outside the deploy workflow) but bounded to the
-	// same blast radius the cron already has every 5 minutes: it can only trigger one bot deal
-	// early, and only when runBotTick's own idle check would allow it anyway. Reports env var
-	// *presence*, never values. Remove once the root cause is confirmed fixed.
-	async fetch(request, env) {
-		const res = await tick(env);
-		const body = await res.text();
-		return new Response(
-			JSON.stringify({
-				hasBotTickSecret: !!env.BOT_TICK_SECRET,
-				hasPreviewSecret: !!env.PREVIEW_SECRET,
-				upstreamStatus: res.status,
-				upstreamBody: body
-			}),
-			{ headers: { 'content-type': 'application/json' } }
+		ctx.waitUntil(
+			fetch(`https://freeroll.org/internal/bots/tick?preview=${env.PREVIEW_SECRET}`, {
+				method: 'POST',
+				headers: { Authorization: `Bearer ${env.BOT_TICK_SECRET}` }
+			})
 		);
 	}
 };
