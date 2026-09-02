@@ -11,7 +11,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "migrate": "tsx src/lib/server/migrate-cli.ts",
-    "bots:seed": "tsx src/lib/server/bots/seed-cli.ts"
+    "bots:seed": "tsx src/lib/server/bots/seed-cli.ts",
+    "badges:backfill": "tsx src/lib/server/game/backfill-badges-cli.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "^7.2.9",
