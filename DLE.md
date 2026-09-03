@@ -67,8 +67,9 @@ without reworking the core.
   Login is only prompted afterward, if the player wants to save their result / claim a streak /
   appear on the leaderboard. (rngdle itself requires login upfront; deliberately deviating here to
   cut first-play friction.)
-- Passwordless magic-link email login (when the player opts in); player picks a **nickname** shown
-  on leaderboards.
+- Passwordless magic-link email login (when the player opts in); picking a **nickname** shown on
+  leaderboards is mandatory immediately after that first login — every other route bounces a
+  signed-in, nickname-less player to the nickname step until they set one.
 - **Nickname moderation:** check against a maintained profanity/slur blocklist at nickname-set time
   (client + server), reject and prompt for another. Not trying to catch leetspeak/evasion — a
   blocklist catching the obvious cases is enough for a low-stakes leaderboard. Backstop with a
