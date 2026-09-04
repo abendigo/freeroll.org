@@ -28,6 +28,7 @@
   "dependencies": {
     "@libsql/client": "^0.14.0",
     "@libsql/kysely-libsql": "^0.4.1",
+    "@sentry/sveltekit": "^10.73.0",
     "kysely": "^0.28.14",
     "obscenity": "^0.4.6",
     "resend": "^6.9.4"
