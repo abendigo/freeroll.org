@@ -5,7 +5,10 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) redirect(303, '/login');
-	return { user: locals.user };
+	// Nickname already set means signup is done and there's nothing left for this page to do —
+	// account management now lives on the profile page itself (see /u/[username]).
+	if (locals.user.nickname) redirect(303, `/u/${locals.user.nickname}`);
+	return {};
 };
 
 export const actions: Actions = {
@@ -20,6 +23,6 @@ export const actions: Actions = {
 			return fail(400, { error: result.error, nickname });
 		}
 
-		return { saved: true };
+		redirect(303, `/u/${nickname}`);
 	}
 };

@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import BadgeGrid from '$lib/components/BadgeGrid.svelte';
 	import MiniCards from '$lib/components/MiniCards.svelte';
 	import type { PageProps } from './$types';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 
 	// SQLite's datetime('now') gives "YYYY-MM-DD HH:MM:SS" (space, no zone) — not directly
 	// parseable as UTC by `new Date()` in every engine, so coerce to ISO-8601 first. `date` on a
@@ -22,7 +23,35 @@
 	<title>Freeroll — {data.nickname}</title>
 </svelte:head>
 
-<section class="section" style="border-top:none;">
+{#if data.isOwnProfile}
+	<section class="section" style="border-top:none; padding-bottom: 0;">
+		<div class="wrap">
+			<details class="account-controls">
+				<summary>Account settings</summary>
+				<form method="POST" action="?/setNickname" use:enhance>
+					<input
+						type="text"
+						name="nickname"
+						placeholder="riverrat"
+						value={form?.nickname ?? data.nickname}
+						minlength="3"
+						maxlength="20"
+						required
+					/>
+					<button class="btn-primary" type="submit">Update</button>
+				</form>
+				{#if form?.error}
+					<p class="error">{form.error}</p>
+				{/if}
+				<form method="POST" action="/logout" style="margin-top: 12px;">
+					<button class="btn-outline" type="submit">Sign out</button>
+				</form>
+			</details>
+		</div>
+	</section>
+{/if}
+
+<section class="section" style={data.isOwnProfile ? '' : 'border-top:none;'}>
 	<div class="wrap">
 		<div class="section-head">
 			<div class="eyebrow">Player</div>
@@ -100,6 +129,46 @@
 </section>
 
 <style>
+	/* Collapsed by default — this is the profile owner's own controls, not something every
+	   visitor needs to see above the fold on their own page. */
+	.account-controls {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 14px;
+		padding: 14px 18px;
+	}
+	.account-controls summary {
+		font-size: 13.5px;
+		font-weight: 700;
+		cursor: pointer;
+	}
+	.account-controls form {
+		margin-top: 14px;
+		display: flex;
+		gap: 10px;
+	}
+	.account-controls input {
+		flex: 1;
+		font-family: inherit;
+		font-size: 14.5px;
+		padding: 10px 12px;
+		border-radius: 10px;
+		border: 1px solid var(--border);
+		background: var(--bg);
+		color: var(--ink);
+	}
+	.account-controls .error {
+		color: color-mix(in srgb, var(--glow-c) 75%, var(--ink));
+		font-size: 13.5px;
+		margin: 10px 0 0;
+	}
+	@media (max-width: 480px) {
+		.account-controls form {
+			flex-direction: column;
+			align-items: stretch;
+		}
+	}
+
 	/* 7 mini-cards (hole + board) plus Date/Result/EP doesn't fit a narrow phone at font-size —
 	   scroll the table itself rather than let the columns squash. */
 	.table-scroll {

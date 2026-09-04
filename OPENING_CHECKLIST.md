@@ -19,10 +19,12 @@ nothing here is started yet.
 - [ ] **Clean up the dealing animation.** (`src/lib/client/reveal.svelte.ts`,
       `src/routes/dev/reveal`.) No specific issues written down yet — needs a pass to decide
       what "clean up" means (timing, sound sync, mobile perf?).
-- [ ] **Remove the account page; fold it into the profile page.** `/account` currently does
-      nickname set/update + sign out (`src/routes/account/`). Move that into `/u/[username]`
-      (`src/routes/u/[username]/`), shown only when `locals.user` is viewing their own profile.
-      Redirect `/account` → own profile (or drop it) once moved.
+- [x] **Remove the account page; fold it into the profile page.** Nickname update + sign out now
+      live on `/u/[username]` itself, in a collapsed "Account settings" panel shown only when
+      `locals.user` is viewing their own profile. `/account` still exists, but only for the
+      pre-nickname signup step (hooks.server.ts still needs somewhere to send a nickname-less
+      user); it redirects to `/u/[nickname]` once one is set, so it's a dead end for everyone
+      past signup.
 - [ ] **Clean up the about page.** `src/routes/about/+page.svelte` — the badge-grid section
       shows sample badges (Full House, Broadway, Monotone Board, Royal Flush, etc.) that aren't
       real badges yet, so it'll need reconciling once "more badges" above ships. Otherwise no

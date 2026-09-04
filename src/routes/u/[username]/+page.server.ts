@@ -1,9 +1,10 @@
-import { error } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { HOLE_CARD_BADGES } from '$lib/badges';
 import { db } from '$lib/server/db';
-import type { PageServerLoad } from './$types';
+import { setNickname } from '$lib/server/auth/nickname';
+import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	// nickname, not id: this is the public profile URL (/u/riverrat), and nickname is already
 	// unique (see UsersTable) — a numeric id route would leak how many users have signed up.
 	const user = await db
@@ -57,6 +58,28 @@ export const load: PageServerLoad = async ({ params }) => {
 		deals,
 		earnedBadges,
 		holeCardBadgesEarned,
-		holeCardBadgeCount: holeCardBadgeIds.length
+		holeCardBadgeCount: holeCardBadgeIds.length,
+		// Account controls (nickname edit, sign out) render on this page only for its own owner —
+		// see +page.svelte. A signed-in visitor always has a nickname by the time they can reach
+		// this route (hooks.server.ts bounces nickname-less users to /account everywhere else).
+		isOwnProfile: locals.user?.id === user.id
 	};
+};
+
+export const actions: Actions = {
+	setNickname: async ({ request, locals, params }) => {
+		if (!locals.user || locals.user.nickname !== params.username) redirect(303, '/login');
+
+		const form = await request.formData();
+		const nickname = String(form.get('nickname') ?? '');
+
+		const result = await setNickname(db, locals.user.id, nickname);
+		if (!result.success) {
+			return fail(400, { error: result.error, nickname });
+		}
+
+		// The nickname just changed, so this URL (keyed on the old one) is stale — send them to
+		// the new one rather than re-rendering /u/<old-name> with a mismatched isOwnProfile.
+		redirect(303, `/u/${nickname}`);
+	}
 };

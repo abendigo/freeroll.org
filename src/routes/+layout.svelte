@@ -56,7 +56,9 @@
 				<button type="button" data-mode="dark" aria-label="Dark theme" bind:this={themeButtons[2]}>☾</button>
 			</div>
 			{#if data.user}
-				<a class="btn-outline" href="/account">{data.user.nickname ?? 'Account'}</a>
+				<a class="btn-outline" href={data.user.nickname ? `/u/${data.user.nickname}` : '/account'}>
+					{data.user.nickname ?? 'Account'}
+				</a>
 			{:else}
 				<a class="btn-outline" href="/login">Sign in</a>
 			{/if}
