@@ -6,8 +6,9 @@ import { env } from '$env/dynamic/private';
 import { redirect, type Handle } from '@sveltejs/kit';
 
 // A signed-in user with no nickname yet is mid-signup, not fully onboarded — every other route
-// bounces them to /account until they set one. Only /account itself (where that happens) and
-// /logout (so a stuck signup can always back out) are exempt.
+// bounces them to /account until they set one. /account itself is only ever the pre-nickname
+// step now (it redirects away to /u/[username] once a nickname exists — see its +page.server.ts)
+// and /logout is exempt too, so a stuck signup can always back out.
 const NICKNAME_SETUP_EXEMPT_PATHS = new Set(['/account', '/logout']);
 
 // Preview bypass: visiting /?preview=<PREVIEW_SECRET> once sets a long-lived cookie that skips
