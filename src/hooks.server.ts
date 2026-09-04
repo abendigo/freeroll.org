@@ -1,8 +1,11 @@
+import { handleErrorWithSentry, sentryHandle, initCloudflareSentryHandle } from '@sentry/sveltekit';
+import { sequence } from '@sveltejs/kit/hooks';
 import { runMigrations } from '$lib/server/migrate';
 import { db } from '$lib/server/db';
 import { SESSION_COOKIE_NAME, validateSession } from '$lib/server/auth/sessions';
 import { comingSoonPage } from '$lib/server/coming-soon';
 import { env } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 import { redirect, type Handle } from '@sveltejs/kit';
 
 // A signed-in user with no nickname yet is mid-signup, not fully onboarded — every other route
@@ -39,7 +42,7 @@ function ensureMigrated(): Promise<void> {
 	return migrationsReady;
 }
 
-export const handle: Handle = async ({ event, resolve }) => {
+const appHandle: Handle = async ({ event, resolve }) => {
 	if (env.COMING_SOON === 'true') {
 		const secret = env.PREVIEW_SECRET;
 		const queryPreview = event.url.searchParams.get('preview');
@@ -90,3 +93,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return resolve(event);
 };
+
+// Error tracking (Bugsink, self-hosted, Sentry-API-compatible — see myfriendsboat for the same
+// setup on Node/Docker). Deliberately the Cloudflare-specific initCloudflareSentryHandle, not a
+// plain Sentry.init() — the latter silently no-ops on Workers because @sentry/sveltekit ships a
+// separate `workerd` build with no `init` export. See
+// discoveries/sentry-sveltekit-cloudflare-workers.md for how that was diagnosed.
+//
+// PUBLIC_SENTRY_DSN is unset in dev and on PR previews (same "off until configured" shape as
+// PUBLIC_UMAMI_URL below it) — an empty/undefined dsn is documented Sentry SDK behavior for
+// "disabled", not an error.
+export const handle = sequence(
+	initCloudflareSentryHandle({ dsn: publicEnv.PUBLIC_SENTRY_DSN, tracesSampleRate: 0 }),
+	sentryHandle(),
+	appHandle
+);
+
+export const handleError = handleErrorWithSentry();

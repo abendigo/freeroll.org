@@ -61,3 +61,7 @@ jobs:
           # pollutes real analytics.
           echo -n "${{ secrets.PUBLIC_UMAMI_URL }}" | npx wrangler secret put PUBLIC_UMAMI_URL --name freeroll-app
           echo -n "${{ secrets.PUBLIC_UMAMI_WEBSITE_ID }}" | npx wrangler secret put PUBLIC_UMAMI_WEBSITE_ID --name freeroll-app
+          # Same "production only" reasoning as Umami above — see hooks.server.ts/hooks.client.ts.
+          # Empty until a Bugsink project exists for freeroll.org; error tracking stays off until
+          # then (unset DSN is documented Sentry SDK behavior for "disabled").
+          echo -n "${{ secrets.PUBLIC_SENTRY_DSN }}" | npx wrangler secret put PUBLIC_SENTRY_DSN --name freeroll-app

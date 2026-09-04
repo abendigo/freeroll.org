@@ -1,5 +1,6 @@
 import type { Kysely } from 'kysely';
 import type { AppDatabase } from '../db';
+import { trackEvent } from '../analytics';
 import { awardHoleCardBadges } from './badges';
 import { buildDeck, cardCode, shuffle, type Card } from './cards';
 import { bestCategory, CATEGORY, CATEGORY_NAMES, type Category } from './evaluator';
@@ -151,6 +152,12 @@ export async function dealForIdentity(db: Kysely<AppDatabase>, identity: DealIde
 	if ('userId' in identity) {
 		await awardHoleCardBadges(db, identity.userId, holeCards as [string, string], today);
 	}
+
+	// "dealt vs. bounced, signed up vs. stayed anonymous" — see OPENING_CHECKLIST.md's analytics
+	// item. Fires only on a genuinely fresh deal, matching the badges guard above, so a reload of
+	// an already-dealt day doesn't double-count. No userId/anonId in the payload — see
+	// analytics.ts's no-PII comment.
+	trackEvent('dealt', { identity: 'userId' in identity ? 'user' : 'anon', handRank });
 
 	return { holeCards, board: boardCodes, perStreetEp, totalEp, handRank, alreadyDealt: false };
 }

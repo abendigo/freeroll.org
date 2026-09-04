@@ -66,9 +66,10 @@ nothing here is started yet.
       are both worth at least a basic per-IP limit before opening publicly.
 - [ ] **No `robots.txt` / `sitemap.xml`.** Nothing under `static/` today. Minor, but easy to
       knock out alongside the favicon/OG-tag item.
-- [ ] **No product analytics.** Separate from the error-tracking/uptime item below — some way to
-      know how many people actually show up on opening day and what they do (dealt vs. bounced,
-      signed up vs. stayed anonymous) is worth having in place before, not after, launch.
+- [x] **No product analytics.** Pageviews + `magic_link_requested`/`signed_in` already went out
+      in PR #13; added `dealt` (tagged `user`/`anon`, plus `handRank`) and `nickname_set` on top,
+      so the "dealt vs. bounced, signed up vs. stayed anonymous" funnel from this item is actually
+      covered now (`src/lib/server/game/deal.ts`, `src/lib/server/auth/nickname.ts`).
 - [ ] **Cookie consent.** Both the anon identity cookie and the session cookie are set with no
       consent banner (`/privacy` exists but there's no cookie notice). Worth a legal gut-check
       depending on who's expected to show up (EU visitors especially).
@@ -91,7 +92,10 @@ nothing here is started yet.
       email/IP can request a sign-in link before opening publicly.
 - [ ] **Mobile/cross-browser pass.** Hasn't been explicitly QA'd across devices; the deal
       animation and badge grid are the most layout-sensitive surfaces.
-- [ ] **Error tracking / uptime monitoring.** Nothing mentioned so far — decide if it's needed
-      before real traffic arrives, or if Cloudflare's own dashboards are enough for launch.
+- [ ] **Error tracking / uptime monitoring.** Error tracking is wired (Sentry SDK → self-hosted
+      Bugsink, same service myfriendsboat uses — see `hooks.server.ts`/`hooks.client.ts` and
+      `discoveries/sentry-sveltekit-cloudflare-workers.md` for the Cloudflare-Workers-specific
+      setup this needed). Still off until `PUBLIC_SENTRY_DSN` is set — needs a Bugsink project
+      created for freeroll.org first. Uptime monitoring is still entirely undecided.
 - [ ] **Database backup plan for Turso.** Worth confirming before real user data accumulates.
 - [ ] **A way for users to report a problem.** No visible feedback/contact link in the app.

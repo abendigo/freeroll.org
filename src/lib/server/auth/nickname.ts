@@ -1,6 +1,7 @@
 import type { Kysely } from 'kysely';
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity';
 import type { AppDatabase } from '../db';
+import { trackEvent } from '../analytics';
 
 const NICKNAME_RE = /^[a-zA-Z0-9_-]{3,20}$/;
 
@@ -36,6 +37,11 @@ export async function setNickname(db: Kysely<AppDatabase>, userId: number, rawNi
 		}
 		throw err;
 	}
+
+	// Covers both the first-run pick (see /account) and a later rename from the profile page —
+	// "signed up vs. stayed anonymous" per OPENING_CHECKLIST.md's analytics item counts a
+	// nickname existing at all as the signup-complete signal, not just the first pick.
+	trackEvent('nickname_set');
 
 	return { success: true };
 }
