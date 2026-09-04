@@ -17,7 +17,7 @@
 			<p>Shown on leaderboards. Pick a different one below if you'd like.</p>
 		{:else}
 			<h1>Choose a nickname</h1>
-			<p>Optional — shown on leaderboards if you set one. Skip it and browse anyway if you're not ready.</p>
+			<p>One more step — pick a nickname before you continue. It's shown on leaderboards.</p>
 		{/if}
 		<form method="POST" action="?/setNickname" use:enhance>
 			<input
@@ -38,8 +38,8 @@
 		{/if}
 		{#if data.user.nickname}
 			<p style="margin-top: 24px;"><a href="/u/{data.user.nickname}">View your public profile</a></p>
+			<p style="margin-top: 24px;"><a href="/">Back to Freeroll</a></p>
 		{/if}
-		<p style="margin-top: 24px;"><a href="/">Skip for now — back to Freeroll</a></p>
 		<form method="POST" action="/logout" style="margin-top: 8px;">
 			<button class="btn-outline" type="submit">Sign out</button>
 		</form>

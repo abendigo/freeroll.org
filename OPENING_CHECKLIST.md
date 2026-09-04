@@ -5,11 +5,10 @@ nothing here is started yet.
 
 ## Product — from today's conversation
 
-- [ ] **Require a nickname on signup.** Right now sign-in is passwordless (magic link,
-      `/login` → `/login/verify`) and the nickname is optional, set later on `/account`
-      (`src/lib/server/auth/nickname.ts` already has the validation + profanity check). Make it
-      mandatory: after first verify, route straight into a "choose a nickname" step before the
-      user can do anything else.
+- [x] **Require a nickname on signup.** `hooks.server.ts` now bounces any signed-in user with
+      no nickname to `/account` on every route except `/account` itself and `/logout` — same
+      form as before (`src/lib/server/auth/nickname.ts` already had the validation + profanity
+      check), just no longer skippable.
 - [ ] **More badges.** Only the 169 hole-card badges + 3 collector meta-badges are built
       (PR #26). DLE.md already speces two more categories that haven't been built yet:
       - Hand-rank badges (Pair, Two Pair, Trips, Straight, Flush, Full House, Quads, Straight
